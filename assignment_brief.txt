@@ -1,0 +1,528 @@
+--- PAGE 1 ---
+ASSESSMENT BRIEF  
+  
+Programme
+MSc Data Science
+Module Title
+Deep Learning Applications
+Module Code
+CMP-L016
+Module Level
+7
+Assessment Type(s)
+portfolio 
+Word Length / 
+Duration  
+ 8–10 pages 
+% contribution to module 
+mark  
+ 100 
+Deadline (date & time) 
+for Submission  
+ 18/12/2025 
+Format/Location of 
+submission  
+Word/ PDF ﬁle 
+and code link 
+on Moodle  
+Assessment 
+Feedback date:  
+ 19/12/2025 
+  
+  
+Learning Outcomes
+This assessment has been designed to 
+provide you with an opportunity to 
+demonstrate your achievement of the 
+learning outcomes listed below.   
+By 
+successfully 
+completing 
+this 
+assessment, you will be able…  
+LO1: 
+Demonstrate 
+a 
+comprehensive
+understanding of current developments in
+deep learning. 
+LO2: Distinguish deep learning models 
+appropriate for supervised, semi-supervised,
+and unsupervised learning. 
+LO3: Demonstrate the ability to use deep 
+learning models to deﬁne a workﬂow to 
+solve a given problem and use such models 
+in a high-level programming language.  
+Employability and Professional Skills
+This assessment is designed to develop and 
+showcase key professional skills that are 
+critical in the workplace. By successfully 
+completing this deep learning project, you will 
+be able to demonstrate: 
+ 
+Applied Deep Learning Proﬁciency: 
+The ability to apply neural network 
+concepts to solve real-world problems, 
+bridging theory and practice. This 
+hands-on project lets you creatively 
+apply course concepts, reinforcing 
+deeper understanding, and simulating 
+tasks you would encounter in industry. 
+ 
+Problem-Solving 
+and 
+Analytical 
+Thinking: Managing an end-to-end 
+machine 
+learning 
+project 
+involves 
+problem 
+decomposition, 
+iterative 
+experimentation, and troubleshooting. 
+You will practice diagnosing model 
+issues, tuning hyperparameters, and 
+
+
+--- PAGE 2 ---
+interpreting results – skills highly valued 
+in AI-related jobs. 
+ 
+Technical 
+Tool 
+Mastery: 
+Use 
+of 
+industry-standard tools and workﬂows, 
+such as coding in Python with deep 
+learning libraries (TensorFlow/PyTorch), 
+dataset handling, and version control 
+(Git/GitHub). For example, you will 
+maintain your code on GitHub or Colab, 
+reﬂecting 
+modern 
+software 
+development practices. 
+ 
+Communication 
+and 
+Reporting: 
+Documenting your work in a structured 
+written report hones your technical 
+communication skills. You must explain 
+complex 
+ideas 
+(neural 
+network 
+architecture, training results, etc.) in 
+clear, professional language. EƯective 
+report writing is a key skill in data 
+science roles for conveying insights to 
+both 
+technical 
+and 
+non-technical 
+stakeholders. 
+ 
+Independent Project Management: 
+Planning and executing the project 
+individually cultivates self-direction and 
+time management. You’ll learn to set 
+objectives, 
+research 
+background 
+literature, 
+and 
+meet 
+deadlines 
+– 
+mirroring the initiative required in 
+professional environments. 
+ 
+Portfolio 
+Development: 
+The 
+completed project (report and code) 
+can serve as a portfolio piece to show 
+future employers. Tackling a unique 
+deep learning project and achieving 
+results gives you a tangible asset to 
+discuss in interviews, enhancing your 
+resume/portfolio in the AI ﬁeld. 
+By the end of this assessment, you will have 
+direct experience in solving a practical AI 
+problem from scratch, demonstrating a blend 
+of technical and soft skills that improve your 
+employability in the tech industry. 
+
+
+--- PAGE 3 ---
+Assessment Requirements
+Overview:  
+This is a 100% coursework assessment for the Deep Learning Applications module. You will 
+work individually on a project of your choice (from the options given) and submit both a 
+written report and supporting code. The assessment is an opportunity to showcase your 
+ability to develop a deep learning solution from inception to evaluation. 
+Deliverables: 
+ 
+Written Report (8–10 pages) – A Word or PDF document following academic writing 
+conventions, to be submitted via Turnitin on the module’s Moodle page. 
+ 
+Code Submission – A link to your code repository or notebook (GitHub repo or Google 
+Colab link) must be provided within your report. This should contain all code 
+developed for the project, with instructions to run or view results. Ensure the 
+repository or notebook permissions are set so the markers can access it. 
+Submission Details: Upload your report to Turnitin by the deadline (see Moodle for the exact 
+date and time). In your report, include the URL to your GitHub repository or Colab notebook 
+(make sure the link is accessible). No physical submission is required. All work is individual, 
+and collusion or plagiarism will be checked via Turnitin and manual review. 
+Report Format and Guidelines: The report should be approximately 8–10 pages long (A4 size, 
+using a standard 11 or 12 pt font, single or 1.15 line spacing). This length excludes the cover 
+page and references (appendices are not expected, but if you include any, keep them brief). 
+It should be well-structured and written in a clear, formal style. A recommended structure is:
+ 
+Title: Project title, your name/student number, module name, and submission date. 
+ 
+Abstract: Optional. A short paragraph summarising the problem, approach, and key 
+results. 
+ 
+Introduction: Introduce the problem you are solving and why it is important. Clearly 
+state the aims/objectives of your project and the scope. Provide any necessary 
+background to set the context. 
+ 
+Background / Literature Review: Brieﬂy review relevant work or methods from 
+textbooks, research papers, or industry to show your understanding of the domain. 
+Identify if others have tackled similar problems and what approaches they used. This 
+section demonstrates awareness of the ﬁeld. 
+ 
+Methodology: Describe your approach in detail. This includes the dataset you used 
+(and how it was collected or sourced), data preprocessing steps, and the design of 
+your deep learning model. Explain the architecture of your neural network, the 
+reasoning behind your design choices, and any algorithms or techniques employed 
+(e.g., transfer learning, regularisation, etc.). If you tried multiple approaches, describe 
+them. 
+
+
+--- PAGE 4 ---
+ 
+Experiments and Results: Explain how you trained the model and present the results. 
+Include details like training/validation split, training duration or epochs, and any tuning 
+of hyperparameters. Present results with appropriate metrics (accuracy, F1-score, 
+MSE, etc. as applicable) and use tables or graphs (learning curves, confusion matrix, 
+sample outputs) to illustrate performance. Compare results for diƯerent model 
+versions or against a baseline if available. 
+ 
+Discussion: Analyse your results. Discuss what the model’s performance indicates 
+about the problem. Mention any challenges or unexpected outcomes and how you 
+addressed them. For example, if the model had poor accuracy on certain classes or 
+the training was unstable, provide insight into why. Relate your ﬁndings back to the 
+objectives – did you meet them? This section is also a place to acknowledge 
+limitations of your approach and suggest possible improvements or future work. 
+ 
+Conclusion: Summarise what was accomplished in the project and the key 
+takeaways. Emphasise the signiﬁcance of your results and any concluding thoughts 
+on using deep learning for this application. 
+ 
+References: List all sources cited in the report (academic papers, online articles, 
+datasets, libraries, etc.) in a consistent citation format (IEEE). Ensure every external 
+idea or resource is properly referenced. 
+Throughout the report, use clear headings and subheadings to guide the reader. Numbered 
+sections (1. Introduction, 2. Methodology, …) are recommended. Include ﬁgure captions and 
+table titles for any visuals, and refer to them in the text (e.g., “As shown in Figure 1…”). Writing 
+clarity and organisation are crucial – avoid overly long paragraphs and use formal academic 
+language. 
+Code and Repository Guidelines: Your code should be neatly organised and documented. 
+If using a GitHub repo, include a README.md with instructions on how to run your code or 
+reproduce your results. If using Colab, ensure that the notebook is well-commented and that 
+all results (ﬁgures, printed metrics) are visible without requiring additional runs (preferably, 
+have it run top-to-bottom). The markers will not signiﬁcantly debug your code – it should run 
+as provided. Using notebooks is ﬁne, but ensure any required data ﬁles are accessible (you 
+may include small data ﬁles in the repo or provide a script to download them). Remember to 
+keep the repository private until submission if it’s not meant to be public (you can invite the 
+instructor/markers as collaborators or provide a private link) to avoid academic integrity 
+issues. After grading, you can open-source your project if desired. 
+Project Options: Below is the list of project topics you can choose from. Each project comes 
+with a brief description outlining the task and expectations. Select one project that interests 
+you. All projects are scoped to be achievable within the given timeframe, using resources 
+available to you (standard datasets, free cloud compute like Colab, etc.). If you have an idea 
+for a diƯerent project, you must get approval from the module leader before proceeding 
+(ensure it’s of similar complexity and learning value). 
+ ࿨
+࿩
+࿪ NLP & Text Intelligence 
+1. Multilingual Fake News Detection Using Transformer-Based Models 
+
+
+--- PAGE 5 ---
+2. Low-Resource Language Sentiment Analysis with Transfer Learning
+3. Named Entity Recognition in Clinical Text Using Domain-Speciﬁc BERT 
+4. Hate Speech and Toxic Comment Classiﬁcation on Social Media 
+5. Legal Document Summarisation with Long-Sequence Transformers 
+6. Mental Health Detection from Reddit/Twitter Posts Using NLP 
+7. Explainable Stance Detection in Political Texts 
+8. Multimodal Fake News Detection (Text + Image) 
+9. Automatic ICD Coding from Clinical Notes Using Deep Learning 
+10. Cross-Lingual Machine Translation for Underrepresented Languages 
+ ࿨
+࿩
+࿪ Computer Vision & Imaging 
+11. Diabetic Retinopathy Detection with CNNs and Explainability 
+12. Breast Cancer Histopathology Image Classiﬁcation Using Vision Transformers 
+13. Fine-Grained Bird Species Recognition using Hybrid CNN-Transformers 
+14. Satellite Imagery Land-Use Classiﬁcation with Segmentation Models 
+15. Face Mask Detection in Crowds Using Real-Time Vision Models 
+16. Road Damage Detection from Street-Level Images 
+17. Plant Disease Recognition Using MobileNet Variants 
+18. Lung Nodule Detection in CT Scans with 3D CNNs 
+19. Aerial Object Detection with YOLOv8 and Transformer Fusion 
+20. Human Activity Recognition from Video Using Pose Estimation Models 
+ ࿨
+࿩
+࿪ Time-Series & Forecasting 
+21. Stock Price Movement Prediction Using Hybrid LSTM-Transformer Models 
+22. Energy Consumption Forecasting for Smart Grids 
+23. ICU Patient Vital Signs Monitoring with Deep Sequence Models 
+24. TraƯic Flow Prediction Using Spatio-Temporal Graph Neural Networks 
+25. Earthquake Time-Series Anomaly Detection 
+26. Cryptocurrency Volatility Prediction Using Multimodal Deep Learning 
+27. COVID-19 Case Forecasting Using Deep Learning Ensembles 
+
+
+--- PAGE 6 ---
+28. Weather Prediction with Temporal Convolutional Networks
+29. Smart Home Appliance Usage Forecasting 
+30. Heart Rate and Arrhythmia Detection from Wearable Sensors 
+ ࿨
+࿩
+࿪ Speech & Audio 
+31. Speech Emotion Recognition Using Spectrogram-Based CNNs 
+32. Multilingual Speech-to-Speech Translation with Transformers 
+33. Environmental Sound Classiﬁcation Using WaveNet Variants 
+34. Music Genre Classiﬁcation with Audio Embeddings 
+35. Voice Cloning Using Generative Adversarial Networks 
+36. Keyword Spotting for Low-Power Devices 
+37. Accent Recognition Using Pretrained Speech Models 
+38. Audio-Visual Speaker Diarization (Speech + Lip Movement) 
+39. Respiratory Disease Detection from Cough Audio Signals 
+40. Speech Enhancement and Noise Reduction with Denoising Autoencoders 
+ ࿨
+࿩
+࿪ Generative AI & DiƯusion Models 
+41. Text-to-Image Generation for Educational Content Using DiƯusion Models 
+42. GAN-Based Data Augmentation for Medical Imaging 
+43. Style Transfer in Digital Art Using Vision Transformers 
+44. Synthetic Tabular Data Generation for Privacy-Preserving ML 
+45. Controllable Music Generation with Transformer-Based GANs 
+ ࿨
+࿩
+࿪ Explainable, Multimodal & Responsible AI 
+46. Explainable Credit Scoring Using Deep Learning and SHAP 
+47. Bias Detection in Facial Recognition Models 
+48. Vision-Language Models for Image Captioning with Explainability 
+49. Fusion of ECG and Clinical Text for Health Prediction 
+50. Fairness-Aware Deep Learning for Job Application Screening 
+(Each project above comes with core requirements, but you are welcome to be creative and go
+beyond – just remember to keep the scope manageable. Whichever project you choose, make
+sure to focus on applying deep learning eƯectively and analysing the results.) 
+
+
+--- PAGE 7 ---
+Note: If datasets are required for your project, you should use publicly available ones (some
+suggestions are given). You are free to use pre-trained models or existing code snippets for
+standard parts of the workﬂow provided you cite any external resources and that the majority
+of the work is your own creation/adaptation. Copy-pasting large portions of someone else’s
+code or writing without acknowledgement is plagiarism. If in doubt about using a resource, ask
+your instructor. 
+Marking Criteria
+Your submission will be evaluated according to the criteria below. It’s important to 
+understand how marks are allocated so you can prioritise your eƯort. The marking rubric is 
+as follows: 
+ 
+Understanding of Problem & Background (20%) – How clearly you articulate the 
+problem and its importance, and the depth of your understanding of the underlying 
+concepts. This includes a well-written introduction and background section. We 
+expect you to explain why a deep learning approach is appropriate for the problem you 
+chose. Excellent work will provide context from literature (with citations) and possibly 
+mention existing solutions or related models, demonstrating a strong grasp of the 
+domain and problem setting. 
+ 
+Methodology & Implementation (25%) – The quality of your solution design and 
+implementation. This criterion looks at how you formulated your approach and the 
+neural network model. Key points include the suitability of your chosen architecture, 
+the correct application of deep learning techniques, and innovation in your method (if 
+any). We will also consider the technical diƯiculty you undertook – for instance, 
+implementing a complex model vs. a simple one, or using advanced techniques 
+appropriately. Your code will be reviewed for organisation and reproducibility (we will 
+check if the code runs or if results are provided). Use of good programming practices 
+(clear structure, comments, version control) will make a positive impression, as it 
+reﬂects professional skills. 
+ 
+Experimental Results & Analysis (30%) – The rigour and depth of your 
+experimentation and analysis of results. This is the most signiﬁcant part of the mark, 
+reﬂecting the core learning from the project. We will assess how you split data 
+(training/validation/test) and the appropriateness of evaluation metrics for the task. 
+High marks require thorough result analysis: presenting results clearly (graphs, 
+tables) and interpreting them correctly. Comparison with baseline models or expected 
+benchmarks adds strength to the analysis. Discuss what went well, what didn’t, and 
+why. For instance, if certain approaches failed, did you analyse the reasons? Did you 
+address any “unexpected outcomes” or societal concerns relevant to the problem, 
+if applicable? Your ability to critically evaluate your model’s performance (beyond just 
+reporting metrics) is crucial here. 
+ 
+Report Quality & Communication (15%) – Clarity, structure, and professionalism of 
+the written report. A top-quality report will be well-organised (following the suggested 
+structure or similar logical ﬂow) and clearly written in proper English. We look for a 
+coherent narrative connecting objectives, methods, and results. Visual elements 
+(ﬁgures, plots) should be appropriately used to enhance understanding and not just 
+
+
+--- PAGE 8 ---
+thrown in. All ﬁgures/tables must be legible, labelled, and referenced in the text. 
+Additionally, proper citation of references is required whenever you draw upon existing 
+work – academic integrity is part of this criterion. Essentially, this criterion evaluates 
+how well you communicate your work to the reader (would a peer understand exactly 
+what you did and what you found?). Treat your report as if you were writing a 
+professional technical report for a client or supervisor. 
+ 
+Originality & Critical Thinking (10%) – Evidence of going beyond the basics and 
+engaging critically with the project. This can be demonstrated through a novel 
+approach, extension or enhancement of standard methods, or just a particularly 
+clever solution to a problem. It also includes your reﬂections on the project: 
+acknowledging limitations, considering alternative approaches, and understanding 
+the implications of your results. We reward insight – for example, recognising a ﬂaw in 
+the data or model and adjusting for it, or discussing how the solution could be applied 
+in a broader context. Even if your model did not achieve stellar results, showing that 
+you learned from the process and can articulate improvements or future work is 
+valuable. On the ﬂip side, trivial projects that do not challenge you or submissions that 
+closely follow tutorials without any customisation will score lower on this criterion. 
+Each section above contributes to the total mark (100%). The marking will also take into 
+account the coherence of the entire submission – we expect consistency between your 
+report and code (e.g., the report shouldn’t claim results that the code could not produce). A 
+detailed rubric with grade descriptors (what constitutes excellent, good, satisfactory, etc., 
+performance in each category) will be available on Moodle for your reference. Ensure you 
+review it so you understand what is expected for a ﬁrst-class (70%+) performance versus a 
+pass. 
+ 
+Assessment Success Guidance
+To excel in this assessment, follow these key tips: 
+ 
+Start Early & Plan: Begin immediately. Break the project into manageable phases with 
+deadlines for research, implementation, analysis, and writing. 
+ 
+Do Background Research: Before coding, review relevant papers and articles to 
+inform your approach and strengthen your report. 
+ 
+Justify Your Choices: Clearly explain your design decisions in your report. Why did 
+you choose a speciﬁc model, architecture, or hyperparameter? 
+ 
+Experiment Systematically: Go beyond a single run. Perform hyperparameter tuning 
+or ablation studies to demonstrate a thorough, methodical approach. 
+ 
+Visualise Your Results: Use plots (e.g., training curves, confusion matrices) and 
+diagrams to clearly present your ﬁndings and model architecture. 
+ 
+Analyse Results Critically: Don’t just state your results—interpret them. Discuss why 
+you got them, analyse any errors, acknowledge limitations, and suggest future 
+improvements. 
+
+
+--- PAGE 9 ---
+ 
+Maintain Academic Integrity: Your submitted work must be your own. Use AI tools 
+responsibly for brainstorming or debugging, but never for writing your report or code. 
+Disclose any signiﬁcant AI assistance. 
+ 
+Present Professionally: Ensure your ﬁnal report is well-structured, proofread for 
+errors, and formatted cleanly. A professional presentation makes a strong impression.
+ 
+Use Available Resources: Take advantage of all support, including oƯice hours, 
+forums, and the provided resource links. 
+Following this guidance can signiﬁcantly improve your project's quality and your ﬁnal grade.
+Assessment Guidance Support, and Formative Feedback
+You are not alone in this process! The teaching team is here to support you through the 
+assessment. 
+Here are your avenues for help: 
+ 
+Assessment Brieﬁng (Week 4): We will hold a dedicated session to detail the project 
+options, submission requirements, and answer your questions. Attendance is highly 
+recommended. 
+ 
+Seminars & Labs: Use lab sessions to get hands-on help from tutors, who will allocate 
+speciﬁc time for project Q&A. 
+ 
+Moodle Q&A Forum: Post questions on the Moodle forum, which the teaching team 
+monitors regularly. Please do not share full solutions. Check the forum weekly for 
+announcements and clariﬁcations. 
+ 
+Formative Feedback: You are strongly encouraged to submit an optional, one-page 
+Project Update by Week 7. This is a chance to get early, ungraded feedback on your 
+progress and direction. 
+ 
+OƯice Hours: The module leader holds weekly oƯice hours for one-on-one guidance. 
+You can also request an appointment via the Bookings with me page. 
+ 
+Use of AI Tools: You may use AI for support, such as brainstorming or coding 
+assistance, but with these rules: 
+o DO NOT use AI to write your report or analysis. All ﬁnal writing must be your 
+own. 
+o You are responsible for testing and verifying any AI-generated code. 
+o Acknowledge any signiﬁcant AI assistance in your submission. 
+o Use AI ethically to enhance your learning, not to bypass it. Ask if you are unsure.
+ 
+Additional Support: Please inform us early if you require special accommodations or 
+are facing personal diƯiculties. The university’s Academic Skills Centre is also 
+available for writing and study support. 
+ 
+Final Feedback: After grading, you will receive detailed feedback on your work to help 
+you understand your performance and improve. 
+
+
+--- PAGE 10 ---
+We encourage you to be proactive in seeking help. Engaging with these opportunities will 
+signiﬁcantly enhance your learning and performance. 
+Contact for Queries/ who you can contact for further information or queries
+You can ﬁnd information about your tutor on the module’s Moodle page. 
+Use of Artiﬁcial Intelligence (AI)
+In this section include details of the use of AI tools to support the assessment.  
+ 
+Please read and apply: 
+https://roehamptonprod.sharepoint.com/sites/portal/information/LTEU/Documents/4a%2
+0AI%20principles%20and%20guidance%20-for%20Senate.docx 
+https://roehamptonprod.sharepoint.com/sites/portal/information/LTEU/Documents/4b%2
+0Student%20Guidelines%20on%20the%20use%20of%20AI_.docx  
+The assessment is designed so that the use of AI during the assessment is possible. 
+You must acknowledge any use of AI and appropriately cite all AI generated outputs. 
+Please make sure you read and understand the assessment guidelines and ask your 
+Module Leader if you have any questions.   
+ You can ﬁnd the student guidance on the use of AI in the Library and Nest 
+Mitigating circumstances/late penalties
+Sometimes circumstances outside of your control may affect your studies and might 
+prevent you from submitting work on time or attending an exam. 
+The University offers the ability for students to request additional time to complete an 
+assessment or to defer an examination to a later date. If you are ﬁnding yourself in such 
+a situation, please speak to your Academic Guidance Tutor, the Roehampton Student 
+Union (RSU) or someone in the Wellbeing team ﬁrst, who can support you. Further 
+details can be found on the mitigating circumstances portal. 
+If you do not apply for or are not approved for Mitigating Circumstances, late penalties 
+will apply. If work is submitted up to 14 days late, the mark will be capped at 40%/50% 
+(delete as appropriate); if it is over 14 days late, it will not be marked. 
+Resubmissions and Reassessment
+If you are required to resubmit this assessment or take part in reassessment, you will be 
+notiﬁed via Moodle and your student email. Please ensure you check both regularly. Any 
+reassessment tasks will follow the same learning outcomes and criteria. 
+Submission Checklist 
+Before you submit, ask yourself: 
+
+
+--- PAGE 11 ---
+Have I fully answered the assessment brief?
+Have I met the word count and formatting requirements? 
+Is my referencing complete and accurate? 
+Have I declared any AI use honestly? 
+Have I proofread my work? 
+Am I submitting through the correct platform before the deadline? 
+  
+ 
+
+
