@@ -18,8 +18,8 @@ env/
 # Data (too large for git)
 data/raw/*.csv
 
-# Model weights (too large for git)
-outputs/models/*.pt
+# Model weights — committed for Streamlit Cloud deployment
+# outputs/models/*.pt
 
 # OS files
 .DS_Store

@@ -9,6 +9,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import os, json
+import requests
 import plotly.graph_objects as go
 import plotly.express as px
 
@@ -19,7 +20,7 @@ from sklearn.preprocessing import StandardScaler
 
 # ==================== PAGE CONFIG ====================
 st.set_page_config(
-    page_title="Weather Prediction — Hybrid DL Models",
+    page_title="Jena Weather Dashboard",
     page_icon="🌤️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -28,9 +29,20 @@ st.set_page_config(
 # ==================== CUSTOM CSS ====================
 st.markdown("""
 <style>
-    /* dark theme overrides */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+    
+    html, body, .stApp {
+        font-family: 'Outfit', sans-serif;
+    }
+    
+    /* Protect material icons from being overridden by custom fonts */
+    .material-symbols-rounded, .stIcon, [data-testid="stIconMaterial"] {
+        font-family: 'Material Symbols Rounded' !important;
+    }
+
+    /* Google Weather dark theme override */
     .stApp {
-        background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+        background-color: #202124;
     }
     
     .main .block-container {
@@ -38,60 +50,70 @@ st.markdown("""
         max-width: 1200px;
     }
     
-    /* metric cards */
-    [data-testid="stMetricValue"] {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #00d4ff;
-    }
-    [data-testid="stMetricLabel"] {
-        color: #a0aec0;
-        font-size: 0.9rem;
-    }
-    
     /* sidebar styling */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background-color: #171717;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
     
     /* headers */
     h1, h2, h3 {
-        color: #e0e7ff !important;
+        color: #e8eaed !important;
+        font-weight: 400 !important;
     }
-    
-    /* custom card */
-    .info-card {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 0.5rem 0;
-        backdrop-filter: blur(10px);
-    }
-    
-    .info-card h4 {
-        color: #00d4ff !important;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* tabs */
+
+    /* tabs (Google style) */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
+        gap: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     .stTabs [data-baseweb="tab"] {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        color: #a0aec0;
-        padding: 10px 20px;
+        background-color: transparent !important;
+        border-radius: 0 !important;
+        color: #9aa0a6 !important;
+        padding: 10px 16px;
+        border: none !important;
+        border-bottom: 2px solid transparent !important;
+        outline: none !important;
     }
     .stTabs [aria-selected="true"] {
-        background-color: rgba(0, 212, 255, 0.15);
-        color: #00d4ff !important;
+        color: #e8eaed !important;
+        border-bottom: 2px solid #8ab4f8 !important;
     }
     
-    /* divider */
+    /* Forecast cards */
+    .forecast-card {
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        background: transparent;
+        transition: background 0.2s ease;
+    }
+    .forecast-card:hover {
+        background: rgba(255,255,255,0.05);
+    }
+    .forecast-day {
+        color: #e8eaed;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .forecast-icon {
+        font-size: 1.8rem;
+        margin: 5px 0;
+    }
+    .forecast-temp {
+        color: #9aa0a6;
+        font-size: 0.9rem;
+    }
+    .forecast-temp span {
+        color: #e8eaed;
+        font-weight: 600;
+        margin-right: 4px;
+    }
+    
     hr {
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.05);
+        margin: 2rem 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -171,11 +193,38 @@ class TCN_LSTM(nn.Module):
 
 
 # ==================== DATA LOADING ====================
+JENA_CSV_URL = "https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip"
+
 @st.cache_data
 def load_data():
+    """Load and preprocess the Jena Climate dataset.
+
+    Reads the raw CSV, resamples to hourly frequency, handles missing
+    values via interpolation, and fits a StandardScaler on the training
+    split (first 70%).  If the CSV is not present locally it is
+    automatically downloaded from the TensorFlow public mirror.
+
+    Returns:
+        tuple: (df, scaled_array, scaler, feature_names) or four Nones
+               if the dataset cannot be obtained.
+    """
     data_path = os.path.join("data", "raw", "jena_climate_2009_2016.csv")
     if not os.path.exists(data_path):
-        return None, None, None, None
+        # Auto-download for Streamlit Cloud deployment
+        try:
+            import zipfile, io, urllib.request
+            st.info("⬇️ Downloading Jena Climate dataset (first run only)...")
+            os.makedirs(os.path.dirname(data_path), exist_ok=True)
+            resp = urllib.request.urlopen(JENA_CSV_URL)
+            with zipfile.ZipFile(io.BytesIO(resp.read())) as zf:
+                # Extract the CSV inside the zip
+                csv_name = [n for n in zf.namelist() if n.endswith('.csv')][0]
+                with zf.open(csv_name) as src, open(data_path, 'wb') as dst:
+                    dst.write(src.read())
+            st.success("✅ Dataset downloaded successfully!")
+        except Exception as e:
+            st.error(f"Could not download dataset: {e}")
+            return None, None, None, None
 
     df = pd.read_csv(data_path)
     date_col = None
@@ -205,8 +254,85 @@ def load_data():
     return df, scaled, scaler, list(df.columns)
 
 
+@st.cache_data(ttl=3600)
+def fetch_live_jena_data(features, _scaler):
+    """Fetch live data from Open-Meteo API and construct the 14 features."""
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": 50.9272,
+        "longitude": 11.5861,
+        "hourly": ["temperature_2m", "relative_humidity_2m", "dew_point_2m", 
+                   "surface_pressure", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m"],
+        "past_days": 7,
+        "forecast_days": 1,
+        "timezone": "Europe/Berlin"
+    }
+    
+    resp = requests.get(url, params=params)
+    data = resp.json()
+    
+    hourly = data["hourly"]
+    df = pd.DataFrame({
+        "time": pd.to_datetime(hourly["time"]),
+        "T (degC)": hourly["temperature_2m"],
+        "rh (%)": hourly["relative_humidity_2m"],
+        "Tdew (degC)": hourly["dew_point_2m"],
+        "p (mbar)": hourly["surface_pressure"],
+        "wv (m/s)": np.array(hourly["wind_speed_10m"]) / 3.6,
+        "max. wv (m/s)": np.array(hourly["wind_gusts_10m"]) / 3.6,
+        "wd (deg)": hourly["wind_direction_10m"]
+    })
+    
+    df = df.dropna().reset_index(drop=True)
+    
+    T = df["T (degC)"]
+    p = df["p (mbar)"]
+    rh = df["rh (%)"]
+    
+    T_K = T + 273.15
+    df["Tpot (K)"] = T_K * (1000 / p) ** 0.286
+    df["VPmax (mbar)"] = 6.112 * np.exp((17.67 * T) / (T + 243.5))
+    df["VPact (mbar)"] = df["VPmax (mbar)"] * (rh / 100)
+    df["VPdef (mbar)"] = df["VPmax (mbar)"] - df["VPact (mbar)"]
+    df["sh (g/kg)"] = 622 * df["VPact (mbar)"] / (p - 0.378 * df["VPact (mbar)"])
+    df["H2OC (mmol/mol)"] = (df["VPact (mbar)"] / p) * 1000
+    Tv = T_K * (1 + (df["sh (g/kg)"] / 1000) * 0.61)
+    df["rho (g/m**3)"] = (p * 100 / (287.05 * Tv)) * 1000
+    
+    df = df.set_index("time")
+    
+    current_hour = pd.Timestamp.now(tz="Europe/Berlin").tz_localize(None).floor('h')
+    
+    # get the nearest index that isn't later than the current_hour
+    try:
+        idx = df.index.get_indexer([current_hour], method='pad')[0]
+    except Exception:
+        idx = len(df) - 1
+        
+    if idx < 167:
+        df_168 = df.iloc[:168].copy()
+    else:
+        df_168 = df.iloc[idx-167:idx+1].copy()
+        
+    df_168 = df_168[features]
+    scaled = _scaler.transform(df_168)
+    return df_168, scaled
+
+
+
 @st.cache_resource
 def load_models(n_features):
+    """Load trained model weights from outputs/models/.
+
+    Attempts to load LSTM, TCN, and TCN-LSTM models. Models whose
+    weight files (.pt or .pth) are not found are silently skipped.
+
+    Args:
+        n_features (int): Number of input features (must match training).
+
+    Returns:
+        dict: Mapping of model name to loaded nn.Module in eval mode.
+    """
     device = torch.device('cpu')
     models_dict = {}
     model_classes = {
@@ -215,20 +341,40 @@ def load_models(n_features):
         'TCN-LSTM': lambda: TCN_LSTM(n_features),
     }
     for name, create_fn in model_classes.items():
-        fname = name.lower().replace('-', '_') + '_best.pt'
-        path = os.path.join("outputs", "models", fname)
-        if os.path.exists(path):
-            try:
-                model = create_fn().to(device)
-                model.load_state_dict(torch.load(path, map_location=device, weights_only=True))
-                model.eval()
-                models_dict[name] = model
-            except Exception:
-                pass
+        # try both .pt and .pth extensions
+        base = name.lower().replace('-', '_') + '_best'
+        for ext in ['.pt', '.pth']:
+            path = os.path.join("outputs", "models", base + ext)
+            if os.path.exists(path):
+                try:
+                    model = create_fn().to(device)
+                    model.load_state_dict(torch.load(path, map_location=device, weights_only=True))
+                    model.eval()
+                    models_dict[name] = model
+                except Exception:
+                    pass
+                break
     return models_dict
 
 
 def predict_future(model, data_scaled, start_idx, seq_len, n_steps, target_idx, scaler):
+    """Generate an autoregressive multi-step temperature forecast.
+
+    Feeds each predicted value back as input for the next step.
+    Results are inverse-transformed to degrees Celsius.
+
+    Args:
+        model (nn.Module): Trained model in eval mode.
+        data_scaled (np.ndarray): Full scaled dataset.
+        start_idx (int): Index where the input window begins.
+        seq_len (int): Length of the input window (hours).
+        n_steps (int): Number of hours to forecast ahead.
+        target_idx (int): Column index of the target variable.
+        scaler (StandardScaler): Fitted scaler for inverse transform.
+
+    Returns:
+        np.ndarray: Predicted temperatures in °C, shape (n_steps,).
+    """
     model.eval()
     seq = torch.FloatTensor(data_scaled[start_idx : start_idx + seq_len])
     preds = []
@@ -246,23 +392,7 @@ def predict_future(model, data_scaled, start_idx, seq_len, n_steps, target_idx, 
 
 # ===================== PAGES =====================
 def page_home():
-    # hero section
-    st.markdown("""
-        <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='font-size: 2.5rem; background: linear-gradient(90deg, #00d4ff, #7b68ee);
-                       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                       font-weight: 800;'>
-                🌤️ Weather Prediction Dashboard
-            </h1>
-            <p style='color: #a0aec0; font-size: 1.1rem; max-width: 600px; margin: auto;'>
-                Hybrid Deep Learning Models for Temperature Forecasting<br>
-                MSc Deep Learning Applications — Project #28
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
+    """Render the main dashboard page styled like Google Weather."""
     # load data
     df, scaled, scaler, features = load_data()
     if df is None:
@@ -279,133 +409,242 @@ def page_home():
 
     # sidebar controls
     st.sidebar.header("⚙️ Controls")
-    selected_model = st.sidebar.selectbox("Select Model", list(models.keys()), index=0)
+    model_options = list(models.keys()) + ["Ensemble (Best)"]
+    selected_model = st.sidebar.selectbox("Select Model", model_options, index=len(model_options)-1)
     forecast_hours = st.sidebar.slider("Forecast Horizon", 1, 48, 24, help="Hours to predict ahead")
 
-    n = len(df)
-    test_start = int(n * 0.85)
-    max_idx = n - 168 - forecast_hours
-    start_point = st.sidebar.slider("Start Point", test_start, max_idx, test_start + 200)
+    data_mode = st.sidebar.radio("Data Source", ["Historical (Jena Dataset)", "Live Forecast (Open-Meteo API)"])
+
+    if data_mode == "Historical (Jena Dataset)":
+        n = len(df)
+        test_start = int(n * 0.85)
+        max_idx = n - 168 - forecast_hours
+        start_point = st.sidebar.slider("Start Point", test_start, max_idx, test_start + 200)
+    else:
+        st.sidebar.info("Fetching real-time weather data for Jena, Germany...")
+        try:
+            df, scaled = fetch_live_jena_data(features, scaler)
+            start_point = 0
+        except Exception as e:
+            st.error(f"Error fetching live data: {e}")
+            return
 
     # current conditions
     current = df.iloc[start_point + 167]
-    st.subheader("📊 Current Conditions")
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.metric("🌡️ Temperature", f"{current[target_col]:.1f}°C")
-    with c2:
-        if 'rh (%)' in features:
-            st.metric("💧 Humidity", f"{current['rh (%)']:.1f}%")
-    with c3:
-        if 'p (mbar)' in features:
-            st.metric("📊 Pressure", f"{current['p (mbar)']:.1f} mbar")
-    with c4:
-        if 'wv (m/s)' in features:
-            st.metric("💨 Wind", f"{current['wv (m/s)']:.1f} m/s")
+    dt = current.name
+    
+    # Map basic conditions based on temp/humidity
+    temp = current[target_col]
+    rh = current['rh (%)'] if 'rh (%)' in features else 50
+    if rh > 85:
+        icon = '🌧️'
+        cond_text = 'Rainy'
+    elif temp < 0:
+        icon = '❄️'
+        cond_text = 'Snow'
+    elif rh > 60:
+        icon = '☁️'
+        cond_text = 'Cloudy'
+    else:
+        icon = '☀️'
+        cond_text = 'Clear'
 
-    st.markdown("---")
+    day_str = dt.strftime("%A %H:%M")
+
+    # ====== HEADER UI ======
+    st.markdown(f"""
+<div style='display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;'>
+<!-- Left Side: Weather Icon, Temp, Extra -->
+<div style='display: flex; align-items: center;'>
+<div style='font-size: 4.5rem; line-height: 1; margin-right: 20px;'>{icon}</div>
+<div style='display: flex; align-items: flex-start;'>
+<div style='font-size: 4rem; font-weight: 300; color: #e8eaed; line-height: 1;'>{int(temp)}</div>
+<div style='font-size: 1.5rem; color: #e8eaed; padding-top: 5px; margin-right: 20px;'>°C</div>
+</div>
+<div style='display: flex; flex-direction: column; justify-content: center; color: #9aa0a6; font-size: 0.85rem; padding-top: 10px;'>
+<div>Pressure: {current['p (mbar)'] if 'p (mbar)' in features else 0:.1f} mbar</div>
+<div>Humidity: {rh:.0f}%</div>
+<div>Wind: {current['wv (m/s)'] if 'wv (m/s)' in features else 0:.1f} m/s</div>
+</div>
+</div>
+
+<!-- Right Side: Weather, Time, Condition -->
+<div style='text-align: right;'>
+<div style='font-size: 1.4rem; color: #e8eaed; font-weight: 400;'>Weather</div>
+<div style='color: #9aa0a6; font-size: 1rem;'>{day_str}</div>
+<div style='color: #9aa0a6; font-size: 1rem;'>{cond_text}</div>
+<div style='margin-top: 10px; opacity: 0.5; font-size: 0.8rem; color: #9aa0a6;'>Jena, Germany</div>
+</div>
+</div>
+""", unsafe_allow_html=True)
 
     # forecast
-    st.subheader(f"📈 {forecast_hours}h Forecast — {selected_model}")
-
-    model = models[selected_model]
-    preds = predict_future(model, scaled, start_point, 168, forecast_hours, target_idx, scaler)
-
+    if selected_model == "Ensemble (Best)":
+        # Run all base models and combine with learned stacking weights
+        ensemble_weights = {'LSTM': 0.45, 'TCN': 0.15, 'TCN-LSTM': 0.10}
+        # Add TCN-Tuned if available
+        if 'TCN-Tuned' in models:
+            ensemble_weights['TCN-Tuned'] = 0.30
+        # Normalize weights to available models
+        available = {k: v for k, v in ensemble_weights.items() if k in models}
+        total_w = sum(available.values())
+        available = {k: v / total_w for k, v in available.items()}
+        
+        preds = np.zeros(forecast_hours)
+        for mname, weight in available.items():
+            p = predict_future(models[mname], scaled, start_point, 168, forecast_hours, target_idx, scaler)
+            preds += weight * p
+    else:
+        model = models[selected_model]
+        preds = predict_future(model, scaled, start_point, 168, forecast_hours, target_idx, scaler)
     actual_slice = df.iloc[start_point + 168 : start_point + 168 + forecast_hours]
-    actual_temps = actual_slice[target_col].values
+    actual_temps = actual_slice[target_col].values if not actual_slice.empty else None
+    
+    if start_point + 168 < len(df):
+        pred_start = df.index[start_point + 168]
+    else:
+        pred_start = df.index[-1] + pd.Timedelta(hours=1)
+    
+    pred_dates = pd.date_range(start=pred_start, periods=forecast_hours, freq='h')
 
-    history = df.iloc[start_point + 120 : start_point + 168]
-    pred_dates = pd.date_range(start=df.index[start_point + 168], periods=forecast_hours, freq='h')
+    # ====== TABS FOR CHARTS ======
+    tabs = st.tabs(["Temperature", "Compare Data"])
 
-    # plotly interactive chart
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=history.index, y=history[target_col],
-                             mode='lines', name='History',
-                             line=dict(color='#a0aec0', width=2)))
-    fig.add_trace(go.Scatter(x=pred_dates, y=actual_temps[:forecast_hours],
-                             mode='lines+markers', name='Actual',
-                             line=dict(color='#00d4ff', width=2),
-                             marker=dict(size=4)))
-    fig.add_trace(go.Scatter(x=pred_dates, y=preds,
-                             mode='lines+markers', name=f'{selected_model} Prediction',
-                             line=dict(color='#7b68ee', width=2, dash='dash'),
-                             marker=dict(size=4)))
+    def create_minimal_chart(x_data, y_data, color_fill, color_line, y_actual=None):
+        fig = go.Figure()
+        
+        # Calculate padding to prevent text cutoff
+        all_y = list(y_data)
+        if y_actual is not None:
+            all_y.extend(list(y_actual))
+        y_min, y_max = min(all_y), max(all_y)
+        y_pad_top = max(4.0, (y_max - y_min) * 0.4)
+        y_pad_bot = max(1.0, (y_max - y_min) * 0.1)
 
-    fig.update_layout(
-        template='plotly_dark',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=400,
-        margin=dict(l=40, r=20, t=10, b=40),
-        legend=dict(orientation='h', y=-0.15),
-        xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
-        yaxis=dict(title='Temperature (°C)', gridcolor='rgba(255,255,255,0.05)')
-    )
-    st.plotly_chart(fig, use_container_width=True)
+        # Glow / shadow effect beneath the line
+        fig.add_trace(go.Scatter(x=x_data, y=y_data,
+                                 mode='lines', showlegend=False,
+                                 line=dict(color=color_line, width=8, shape='spline'),
+                                 opacity=0.15, hoverinfo='skip'))
+        
+        # Main forecast line
+        fig.add_trace(go.Scatter(x=x_data, y=y_data,
+                                 mode='lines+markers+text', name='Forecast',
+                                 line=dict(color=color_line, width=3, shape='spline'),
+                                 fill='tozeroy', fillcolor=color_fill,
+                                 marker=dict(size=8, color='#202124', line=dict(color=color_line, width=2)),
+                                 text=[f"<b>{int(y)}°</b>" for y in y_data], textposition="top center",
+                                 textfont=dict(color='#ffffff', size=14)))
+                                 
+        if y_actual is not None:
+             fig.add_trace(go.Scatter(x=x_data, y=y_actual,
+                                 mode='lines+markers', name='Actual',
+                                 line=dict(color='#ffab40', width=2, dash='dot', shape='spline'),
+                                 marker=dict(size=6, color='#ffab40')))
 
-    # error metrics
-    if len(actual_temps) >= forecast_hours:
+        fig.update_layout(
+            template='plotly_dark',
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            height=280, margin=dict(l=0, r=0, t=50, b=0),
+            showlegend=y_actual is not None, legend=dict(orientation="h", y=1.2, x=0.5, xanchor="center"),
+            hovermode="x unified"
+        )
+        
+        # Minimalist axes with dynamic range
+        fig.update_xaxes(showgrid=False, zeroline=False, showline=False, showticklabels=True, tickfont=dict(color='#9aa0a6', size=11))
+        fig.update_yaxes(showgrid=False, zeroline=False, showline=False, showticklabels=False, range=[y_min - y_pad_bot, y_max + y_pad_top])
+        return fig
+
+    with tabs[0]:
+        st.plotly_chart(create_minimal_chart(
+            pred_dates, preds, 
+            'rgba(251, 188, 5, 0.2)', '#fbbc05',  # Google Gold
+            actual_temps
+        ), use_container_width=True)
+
+    with tabs[1]:
+        # Compare all models minimalist view
+        fig_cmp = go.Figure()
+        model_colors = {'LSTM': '#4285f4', 'TCN': '#ea4335', 'TCN-LSTM': '#34a853', 'TCN-Tuned': '#fbbc05'}
+        all_model_preds = {}
+        for name, m in models.items():
+            p = predict_future(m, scaled, start_point, 168, forecast_hours, target_idx, scaler)
+            all_model_preds[name] = p
+            fig_cmp.add_trace(go.Scatter(x=pred_dates, y=p, mode='lines', name=name,
+                line=dict(color=model_colors.get(name, '#fff'), width=2, shape='spline')))
+
+        # Add Ensemble line (weighted combination of all base models)
+        ens_w = {'LSTM': 0.45, 'TCN': 0.15, 'TCN-LSTM': 0.10, 'TCN-Tuned': 0.30}
+        avail_w = {k: v for k, v in ens_w.items() if k in all_model_preds}
+        tw = sum(avail_w.values())
+        ens_pred = np.zeros(forecast_hours)
+        for mname, w in avail_w.items():
+            ens_pred += (w / tw) * all_model_preds[mname]
+        fig_cmp.add_trace(go.Scatter(x=pred_dates, y=ens_pred, mode='lines', name='Ensemble (Best)',
+            line=dict(color='#f59e0b', width=3, dash='dash', shape='spline')))
+
+        if actual_temps is not None:
+            fig_cmp.add_trace(go.Scatter(x=pred_dates, y=actual_temps, mode='lines', name='Actual',
+                    line=dict(color='#ffffff', width=2, dash='dot')))
+        fig_cmp.update_layout(template='plotly_dark', paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            height=300, margin=dict(l=0, r=0, t=10, b=0),
+            legend=dict(orientation="h", y=1.15, x=0.5, xanchor="center"),
+            hovermode="x unified")
+        fig_cmp.update_xaxes(showgrid=False, zeroline=False)
+        fig_cmp.update_yaxes(showgrid=True, gridcolor='rgba(255,255,255,0.05)', zeroline=False)
+        st.plotly_chart(fig_cmp, use_container_width=True)
+
+    # ====== HORIZONTAL FORECAST ROW ======
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    n_cols = 7
+    cols = st.columns(n_cols)
+    
+    # We step through the forecast hours to show 7 distinct points
+    step = max(1, forecast_hours // n_cols)
+    
+    for i in range(n_cols):
+        idx = min(i * step, len(preds) - 1)
+        p_val = preds[idx]
+        p_dt = pred_dates[idx]
+        
+        # simplistic icon selection based on temp value (to mimic variation)
+        if p_val > 25: c_icon = '☀️'
+        elif p_val > 15: c_icon = '⛅'
+        elif p_val > 5: c_icon = '☁️'
+        elif p_val < 0: c_icon = '❄️'
+        else: c_icon = '🌧️'
+        
+        with cols[i]:
+            st.markdown(f"""
+            <div class='forecast-card'>
+                <div class='forecast-day'>{p_dt.strftime('%a %H:%M')}</div>
+                <div class='forecast-icon'>{c_icon}</div>
+                <div class='forecast-temp'><span>{int(p_val)}°</span></div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+    st.markdown("---")
+    
+    # error metrics (kept simple at the bottom)
+    if actual_temps is not None and len(actual_temps) >= forecast_hours:
         from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
         mae = mean_absolute_error(actual_temps[:forecast_hours], preds)
         rmse = np.sqrt(mean_squared_error(actual_temps[:forecast_hours], preds))
         r2 = r2_score(actual_temps[:forecast_hours], preds)
 
-        m1, m2, m3 = st.columns(3)
-        m1.metric("MAE", f"{mae:.3f}°C")
-        m2.metric("RMSE", f"{rmse:.3f}°C")
-        m3.metric("R²", f"{r2:.4f}")
-
-    st.markdown("---")
-
-    # compare all models
-    st.subheader("🔄 Compare All Models")
-
-    compare_fig = go.Figure()
-    compare_fig.add_trace(go.Scatter(x=pred_dates, y=actual_temps[:forecast_hours],
-                                     mode='lines+markers', name='Actual',
-                                     line=dict(color='#ffffff', width=2.5),
-                                     marker=dict(size=4)))
-
-    model_colors = {'LSTM': '#3498db', 'TCN': '#9b59b6', 'TCN-LSTM': '#e67e22'}
-    for name, m in models.items():
-        p = predict_future(m, scaled, start_point, 168, forecast_hours, target_idx, scaler)
-        compare_fig.add_trace(go.Scatter(
-            x=pred_dates, y=p, mode='lines', name=name,
-            line=dict(color=model_colors.get(name, '#888'), width=2, dash='dash')))
-
-    compare_fig.update_layout(
-        template='plotly_dark',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=400,
-        margin=dict(l=40, r=20, t=10, b=40),
-        legend=dict(orientation='h', y=-0.15),
-        xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
-        yaxis=dict(title='Temperature (°C)', gridcolor='rgba(255,255,255,0.05)')
-    )
-    st.plotly_chart(compare_fig, use_container_width=True)
-
-    # performance table
-    if len(actual_temps) >= forecast_hours:
-        from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-        perf = []
-        for name, m in models.items():
-            p = predict_future(m, scaled, start_point, 168, forecast_hours, target_idx, scaler)
-            a = actual_temps[:forecast_hours]
-            perf.append({
-                'Model': name,
-                'MAE (°C)': round(mean_absolute_error(a, p), 4),
-                'RMSE (°C)': round(np.sqrt(mean_squared_error(a, p)), 4),
-                'R²': round(r2_score(a, p), 4),
-            })
-        st.dataframe(pd.DataFrame(perf).set_index('Model'),
-                      use_container_width=True)
+        st.markdown(f"<div style='color:#9aa0a6; font-size:0.85rem;'>Metrics for {selected_model}: MAE: {mae:.2f}°C | RMSE: {rmse:.2f}°C | R²: {r2:.3f}</div>", unsafe_allow_html=True)
+    elif actual_temps is None:
+        st.markdown(f"<div style='color:#9aa0a6; font-size:0.85rem;'>Live forecast for {selected_model} (Metrics unavailable until future occurs)</div>", unsafe_allow_html=True)
 
 
 def page_about():
+    """Render the About page with project overview and model architecture details."""
     st.markdown("""
         <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='color: #e0e7ff;'>About This Project</h1>
+            <div style='display: inline-block; padding: 4px 12px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 20px; color: #00e5ff; font-weight: 600; font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>
+                📍 ABOUT
+            </div>
+            <h1 style='color: #ffffff; font-weight: 800; margin-bottom: 0;'>About This Project</h1>
         </div>
     """, unsafe_allow_html=True)
 
@@ -498,37 +737,73 @@ def page_about():
 
 
 def page_results():
+    """Render the Results page showing training and evaluation summaries."""
     st.markdown("""
         <div style='text-align: center; padding: 2rem 0;'>
-            <h1 style='color: #e0e7ff;'>📊 Training Results</h1>
+            <div style='display: inline-block; padding: 4px 12px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 20px; color: #a855f7; font-weight: 600; font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>
+                📈 PERFORMANCE
+            </div>
+            <h1 style='color: #ffffff; font-weight: 800; margin-bottom: 0;'>Training Results</h1>
         </div>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # try loading saved results
     m2_path = os.path.join("outputs", "results", "milestone2_results.json")
     m3_path = os.path.join("outputs", "results", "milestone3_results.json")
 
+    # ── Milestone 2 ──
     if os.path.exists(m2_path):
         with open(m2_path) as f:
             m2_results = json.load(f)
 
         st.subheader("Milestone 2 — Training Summary")
-        if 'models' in m2_results:
+
+        # M2 data may be flat (model-name keys at top level) or nested under 'models'
+        model_data = m2_results.get('models', None)
+        if model_data is None:
+            # flat structure: every key except meta keys is a model
+            model_data = {k: v for k, v in m2_results.items() if isinstance(v, dict)}
+
+        if model_data:
             rows = []
-            for name, info in m2_results['models'].items():
+            for name, info in model_data.items():
                 rows.append({
                     'Model': name,
-                    'Type': info.get('type', ''),
-                    'Parameters': f"{info.get('params', 0):,}",
-                    'Epochs': info.get('epochs', ''),
-                    'Val MSE': f"{info.get('val_mse', 0):.6f}",
-                    'Time': f"{info.get('time', 0):.0f}s"
+                    'Type': info.get('type', '—'),
+                    'Parameters': f"{info.get('params', 0):,}" if info.get('params') else '—',
+                    'Epochs': info.get('epochs', '—'),
+                    'Best Val Loss': f"{info.get('best_val_loss', info.get('val_mse', 0)):.6f}",
+                    'Time': f"{info.get('time_seconds', info.get('time', 0)):.0f}s" if info.get('time_seconds', info.get('time')) else '—'
                 })
-            st.dataframe(pd.DataFrame(rows).set_index('Model'),
-                          use_container_width=True)
+            st.dataframe(pd.DataFrame(rows).set_index('Model'), use_container_width=True)
 
+            # Interactive Plotly chart — Val Loss comparison
+            names = [r['Model'] for r in rows]
+            losses = [float(r['Best Val Loss']) for r in rows]
+            colors_m2 = ['#3498db', '#9b59b6', '#e67e22', '#2ecc71', '#f39c12']
+            fig_m2 = go.Figure(data=[go.Bar(
+                x=names, y=losses,
+                marker_color=colors_m2[:len(names)],
+                text=[f"{v:.4f}" for v in losses],
+                textposition='outside',
+                textfont=dict(color='white', size=12)
+            )])
+            fig_m2.update_layout(
+                title=dict(text='Validation Loss Comparison', font=dict(color='white', size=16)),
+                template='plotly_dark',
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                height=350,
+                yaxis_title='Best Val MSE',
+                xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                yaxis=dict(gridcolor='rgba(255,255,255,0.08)')
+            )
+            st.plotly_chart(fig_m2, use_container_width=True)
+
+    st.markdown("---")
+
+    # ── Milestone 3 ──
     if os.path.exists(m3_path):
         with open(m3_path) as f:
             m3_results = json.load(f)
@@ -544,30 +819,119 @@ def page_results():
                     'R²': f"{metrics['R2']:.4f}",
                     'MAPE (%)': f"{metrics['MAPE']:.2f}"
                 })
-            st.dataframe(pd.DataFrame(rows).set_index('Model'),
-                          use_container_width=True)
+            st.dataframe(pd.DataFrame(rows).set_index('Model'), use_container_width=True)
 
-            best = m3_results.get('best_model', 'Unknown')
-            st.success(f"🏆 Best model: **{best}**")
+            # ── Dynamically find the best model by lowest MAE ──
+            best_name = min(m3_results['single_step'].items(), key=lambda x: x[1]['MAE'])[0]
+            best_mae = m3_results['single_step'][best_name]['MAE']
+            best_r2 = m3_results['single_step'][best_name]['R2']
 
-        if 'ensemble_weights' in m3_results:
-            st.subheader("Ensemble Weights")
-            weights = m3_results['ensemble_weights']
-            fig = go.Figure(data=[go.Bar(
-                x=list(weights.keys()),
-                y=list(weights.values()),
-                marker_color=['#3498db', '#9b59b6', '#e67e22', '#2ecc71'][:len(weights)]
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.25));
+                        border: 1px solid rgba(16,185,129,0.4); border-radius: 12px;
+                        padding: 1.2rem 1.5rem; margin: 1rem 0;'>
+                <div style='display: flex; align-items: center; gap: 12px;'>
+                    <span style='font-size: 2rem;'>🏆</span>
+                    <div>
+                        <div style='color: #10b981; font-weight: 700; font-size: 1.1rem;'>Best Model: {best_name}</div>
+                        <div style='color: #6ee7b7; font-size: 0.9rem;'>MAE: {best_mae:.2f}°C  •  R²: {best_r2:.3f}  •  Lowest error across all architectures</div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("")
+
+            # ── Interactive MAE / RMSE grouped bar chart ──
+            model_names = list(m3_results['single_step'].keys())
+            mae_vals = [m3_results['single_step'][n]['MAE'] for n in model_names]
+            rmse_vals = [m3_results['single_step'][n]['RMSE'] for n in model_names]
+
+            fig_comp = go.Figure()
+            fig_comp.add_trace(go.Bar(name='MAE (°C)', x=model_names, y=mae_vals,
+                                       marker_color='#f59e0b',
+                                       text=[f"{v:.2f}" for v in mae_vals],
+                                       textposition='outside', textfont=dict(color='#fbbf24', size=11)))
+            fig_comp.add_trace(go.Bar(name='RMSE (°C)', x=model_names, y=rmse_vals,
+                                       marker_color='#ef4444',
+                                       text=[f"{v:.2f}" for v in rmse_vals],
+                                       textposition='outside', textfont=dict(color='#fca5a5', size=11)))
+            fig_comp.update_layout(
+                barmode='group',
+                title=dict(text='MAE vs RMSE — All Models', font=dict(color='white', size=16)),
+                template='plotly_dark',
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                height=380,
+                legend=dict(font=dict(color='white')),
+                yaxis_title='Error (°C)',
+                xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                yaxis=dict(gridcolor='rgba(255,255,255,0.08)')
+            )
+            st.plotly_chart(fig_comp, use_container_width=True)
+
+            # ── R² comparison (horizontal bar) ──
+            r2_vals = [m3_results['single_step'][n]['R2'] for n in model_names]
+            colors_r2 = ['#3b82f6', '#a855f7', '#f97316', '#10b981', '#eab308']
+            fig_r2 = go.Figure(data=[go.Bar(
+                y=model_names, x=r2_vals, orientation='h',
+                marker_color=colors_r2[:len(model_names)],
+                text=[f"{v:.4f}" for v in r2_vals],
+                textposition='inside', textfont=dict(color='white', size=12)
             )])
-            fig.update_layout(
+            fig_r2.update_layout(
+                title=dict(text='R² Score Comparison (closer to 1.0 = better)', font=dict(color='white', size=16)),
                 template='plotly_dark',
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
                 height=300,
-                yaxis_title='Weight',
-                xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                xaxis=dict(range=[0.98, 1.0], gridcolor='rgba(255,255,255,0.08)'),
                 yaxis=dict(gridcolor='rgba(255,255,255,0.05)')
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig_r2, use_container_width=True)
+
+        # ── Ablation Depth Results ──
+        if 'ablation_depth' in m3_results:
+            st.markdown("---")
+            st.subheader("TCN Depth Ablation Study")
+            abl = m3_results['ablation_depth']
+            depths = sorted(abl.keys(), key=int)
+            abl_mae = [abl[d]['MAE'] for d in depths]
+            abl_rf = [abl[d]['rf'] for d in depths]
+
+            fig_abl = go.Figure()
+            fig_abl.add_trace(go.Scatter(
+                x=[f"{d} blocks" for d in depths], y=abl_mae,
+                mode='lines+markers+text', name='MAE',
+                line=dict(color='#f59e0b', width=3),
+                marker=dict(size=12, color='#f59e0b', line=dict(color='white', width=2)),
+                text=[f"{v:.2f}°C" for v in abl_mae],
+                textposition='top center', textfont=dict(color='#fbbf24', size=11)
+            ))
+            fig_abl.update_layout(
+                title=dict(text='MAE by TCN Depth (Receptive Field Expansion)', font=dict(color='white', size=16)),
+                template='plotly_dark',
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                height=350,
+                yaxis_title='Test MAE (°C)',
+                xaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
+                yaxis=dict(gridcolor='rgba(255,255,255,0.08)')
+            )
+            st.plotly_chart(fig_abl, use_container_width=True)
+
+            # RF info cards
+            rf_cols = st.columns(len(depths))
+            for i, d in enumerate(depths):
+                with rf_cols[i]:
+                    st.markdown(f"""
+                    <div style='background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.25);
+                                border-radius: 10px; padding: 0.8rem; text-align: center;'>
+                        <div style='color: #a855f7; font-weight: 700; font-size: 1.3rem;'>{d}</div>
+                        <div style='color: #94a3b8; font-size: 0.75rem;'>blocks</div>
+                        <div style='color: #e2e8f0; font-weight: 600; margin-top: 4px;'>RF: {abl_rf[i]}h</div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
     if not os.path.exists(m2_path) and not os.path.exists(m3_path):
         st.info("No saved results found. Run the M2 and M3 notebooks first to generate results.")
@@ -575,6 +939,7 @@ def page_results():
 
 # ==================== MAIN ====================
 def main():
+    """Entry point: configure sidebar navigation and route to pages."""
     # sidebar navigation
     st.sidebar.markdown("""
         <div style='text-align: center; padding: 1rem 0;'>
