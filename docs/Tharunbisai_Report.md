@@ -1,7 +1,7 @@
 # Weather Prediction with Hybrid Deep Learning Models
 
 **Author:** Tharun  
-**Student ID:** [Your Student ID]  
+**Student ID:** A00066558  
 **Module:** MSc Deep Learning Applications (CMP-L016)  
 **Project #28**
 
@@ -131,13 +131,12 @@ The dashboard will open at `http://localhost:8501`.
 4. View current weather conditions, forecast charts, and performance metrics
 5. Use "Compare All Models" section to see side-by-side predictions
 
-### 4.4 Deploying to Streamlit Cloud
+### 4.4 Live Cloud Deployment
+The application is officially deployed on the Streamlit Community Cloud and can be accessed from any device.
 
-1. Push code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub repository
-4. Set `app.py` as the main file
-5. Deploy
+👉 **[Launch Live Dashboard](https://weather-tcn-forecasting.streamlit.app)**
+
+*(Deployment configuration: GitHub repository `tharun2431/weather-tcn-forecasting`, `main` branch, pointing to `app.py`)*
 
 ---
 
@@ -197,12 +196,12 @@ The deployed web dashboard provides an accessible interface for non-technical us
 
 ## References
 
-[1] S. Hochreiter and J. Schmidhuber, "Long Short-Term Memory," *Neural Computation*, vol. 9, no. 8, pp. 1735–1780, 1997.
+[1] P. Bauer, A. Thorpe, and G. Brunet, "The quiet revolution of numerical weather prediction," *Nature*, vol. 525, pp. 47–55, 2015.
 
-[2] S. Bai, J. Z. Kolter, and V. Koltun, "An Empirical Evaluation of Generic Convolutional and Recurrent Networks for Sequence Modeling," *arXiv preprint arXiv:1803.01271*, 2018.
+[2] S. Bai, J. Z. Kolter, and V. Koltun, "An empirical evaluation of generic convolutional and recurrent networks for sequence modeling," 2018, arXiv:1803.01271. [Online]. Available: https://arxiv.org/abs/1803.01271
 
-[3] D. H. Wolpert, "Stacked Generalization," *Neural Networks*, vol. 5, no. 2, pp. 241–259, 1992.
+[3] D. H. Wolpert, "Stacked generalization," *Neural Networks*, vol. 5, no. 2, pp. 241–259, 1992.
 
-[4] A. van den Oord et al., "WaveNet: A Generative Model for Raw Audio," *arXiv preprint arXiv:1609.03499*, 2016.
+[4] S. Hochreiter and J. Schmidhuber, "Long short-term memory," *Neural Computation*, vol. 9, no. 8, pp. 1735–1780, 1997.
 
-[5] K. He, X. Zhang, S. Ren, and J. Sun, "Deep Residual Learning for Image Recognition," *Proc. IEEE CVPR*, pp. 770–778, 2016.
+[5] D. P. Kingma and J. Ba, "Adam: A method for stochastic optimization," 2014, arXiv:1412.6980. [Online]. Available: https://arxiv.org/abs/1412.6980

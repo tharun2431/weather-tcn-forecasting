@@ -32,10 +32,14 @@ Upload `notebooks/Tharun_ML2.ipynb` to Google Colab and run all cells.
 Upload `notebooks/Tharun_ML3.ipynb` to Colab (after M2 finishes).
 
 ### 4. Launch Dashboard
+
+**🌍 Live Cloud Deployment:**  
+👉 **[weather-tcn-forecasting.streamlit.app](https://weather-tcn-forecasting.streamlit.app)**
+
+*To run legally/locally:*
 ```bash
 streamlit run app.py
 ```
-Opens at `http://localhost:8501`
 
 ## Project Structure
 
