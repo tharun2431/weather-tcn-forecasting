@@ -94,7 +94,7 @@
     }
     .header .location:hover { color: var(--text-primary); }
     .header .location svg { width: 14px; height: 14px; }
-    .header .ai-badge {
+    .header .live-badge {
       display: flex;
       align-items: center;
       gap: 5px;
@@ -107,7 +107,7 @@
       color: var(--accent-blue);
       letter-spacing: 0.5px;
     }
-    .ai-badge .dot {
+    .live-badge .dot {
       width: 6px; height: 6px;
       background: var(--accent-green);
       border-radius: 50%;
@@ -164,8 +164,8 @@
     }
     .temp-range span { color: var(--text-secondary); font-weight: 500; }
 
-    /* ===== AI PREDICTION CARD ===== */
-    .ai-card {
+    /* ===== PREDICTION CARD ===== */
+    .predict-card {
       background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(167, 139, 250, 0.08));
       border: 1px solid rgba(96, 165, 250, 0.15);
       border-radius: 16px;
@@ -177,7 +177,7 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
     }
-    .ai-card .ai-icon {
+    .predict-card .predict-icon {
       width: 40px; height: 40px;
       background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
       border-radius: 12px;
@@ -187,13 +187,13 @@
       font-size: 20px;
       flex-shrink: 0;
     }
-    .ai-card .ai-text h4 {
+    .predict-card .predict-text h4 {
       font-size: 13px;
       font-weight: 600;
       color: var(--accent-blue);
       margin-bottom: 2px;
     }
-    .ai-card .ai-text p {
+    .predict-card .predict-text p {
       font-size: 12px;
       color: var(--text-secondary);
       line-height: 1.4;
@@ -386,19 +386,82 @@
       align-items: center;
       justify-content: center;
       min-height: 80vh;
-      gap: 16px;
+      gap: 20px;
     }
-    .loading .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
+    .loading-icons {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .loading-icons .orbit {
+      position: absolute;
+      inset: 0;
+      border: 2px solid transparent;
       border-top-color: var(--accent-blue);
+      border-right-color: var(--accent-purple);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 1.2s linear infinite;
+    }
+    .loading-icons .orbit:nth-child(2) {
+      inset: 8px;
+      border-top-color: var(--accent-orange);
+      border-right-color: var(--accent-green);
+      animation-duration: 1.8s;
+      animation-direction: reverse;
+    }
+    .loading-icons .center-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      animation: iconSwitch 3s ease-in-out infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes iconSwitch {
+      0%, 20% { content: '☀️'; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      25% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      30%, 50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      55% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      60%, 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      85% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      90%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    .loading-brand {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
     .loading p {
-      font-size: 14px;
-      color: var(--text-secondary);
+      font-size: 13px;
+      color: var(--text-tertiary);
+      animation: loadText 2s ease-in-out infinite;
+    }
+    @keyframes loadText {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    .loading .progress-bar {
+      width: 140px;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .loading .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+      border-radius: 2px;
+      animation: progressAnim 2s ease-in-out infinite;
+    }
+    @keyframes progressAnim {
+      0% { width: 0%; margin-left: 0; }
+      50% { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
     }
 
     /* ===== SCREENS ===== */
@@ -564,8 +627,14 @@
 
   <!-- LOADING SCREEN -->
   <div id="loadingScreen" class="loading">
-    <div class="spinner"></div>
-    <p>Fetching weather prediction...</p>
+    <div class="loading-icons">
+      <div class="orbit"></div>
+      <div class="orbit"></div>
+      <div class="center-icon">🌤️</div>
+    </div>
+    <div class="loading-brand">DeepWeather</div>
+    <p>Fetching live weather data...</p>
+    <div class="progress-bar"><div class="progress-fill"></div></div>
   </div>
 
   <!-- ===== WEATHER SCREEN ===== -->
@@ -576,7 +645,7 @@
         <span id="cityName">Loading...</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;"><path d="M6 9l6 6 6-6"/></svg>
       </div>
-      <div class="ai-badge">
+      <div class="live-badge">
         <div class="dot"></div>
         LIVE
       </div>
@@ -589,11 +658,11 @@
       <div class="temp-range">H: <span id="hiTemp">--°</span>  L: <span id="loTemp">--°</span></div>
     </div>
 
-    <div class="ai-card">
-      <div class="ai-icon">🧠</div>
-      <div class="ai-text">
+    <div class="predict-card">
+      <div class="predict-icon">🧠</div>
+      <div class="predict-text">
         <h4>Ensemble Model Prediction</h4>
-        <p id="aiPredText">Analysing current conditions with TCN-LSTM hybrid and stacking ensemble deep learning models...</p>
+        <p id="predText">Analysing current conditions with TCN-LSTM hybrid and stacking ensemble deep learning models...</p>
       </div>
     </div>
 
@@ -831,7 +900,7 @@ function renderWeather(data, city) {
   // AI Prediction text
   const tempTrend = h.temperature_2m[6] > c.temperature_2m ? 'rise' : 'drop';
   const diff = Math.abs(h.temperature_2m[6] - c.temperature_2m).toFixed(1);
-  document.getElementById('aiPredText').textContent = 
+  document.getElementById('predText').textContent = 
     `Ensemble model predicts temperature will ${tempTrend} by ${diff}°C over the next 6 hours. Current accuracy: MAE 0.37°C on Jena test data.`;
 
   // Hourly forecast (next 24h)
