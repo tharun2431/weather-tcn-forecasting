@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v14-unbugged-utf8';
+const CACHE_NAME = 'deepweather-v15-temporal-pills';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
