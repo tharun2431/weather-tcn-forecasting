@@ -950,33 +950,36 @@ body.is-day.theme-sunny .stars { opacity: 0 !important; }
 .detail-row span:first-child { color: var(--text-secondary); }
 .detail-row span:last-child { color: #fff; font-weight: 600; }
 
-/* ===== HOURLY CHART OVERLAY ===== */
-.hourly-chart-wrap {
-  position: relative;
-  margin: 0 -16px;
-  padding: 0 16px;
+/* ===== HOURLY CHART (fixed-width preview above scroll) ===== */
+.hourly-chart-card {
+  position: relative; height: 90px;
+  margin: 0 0 12px;
+  padding: 8px 4px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .hourly-chart-svg {
-  position: absolute; top: 10px; left: 16px; right: 16px;
-  height: 60px; width: calc(100% - 32px);
-  pointer-events: none;
+  width: 100%; height: 100%; display: block;
   overflow: visible;
 }
 .chart-line {
   fill: none;
   stroke: url(#chartLineGrad);
-  stroke-width: 2.5;
+  stroke-width: 2.4;
   stroke-linecap: round; stroke-linejoin: round;
-  filter: drop-shadow(0 2px 6px rgba(138,180,248,0.35));
-  animation: chartDraw 1.4s ease-out both;
-}
-@keyframes chartDraw {
-  from { stroke-dashoffset: 500; }
-  to   { stroke-dashoffset: 0; }
+  filter: drop-shadow(0 2px 6px rgba(138,180,248,0.4));
+  vector-effect: non-scaling-stroke;
 }
 .chart-area {
   fill: url(#chartAreaGrad);
   opacity: 0.8;
+}
+.chart-label {
+  fill: var(--text-primary); font-size: 9px; font-weight: 700;
+  text-anchor: middle; pointer-events: none;
+}
+.chart-time-label {
+  fill: var(--text-tertiary); font-size: 8px; font-weight: 600;
+  text-anchor: middle; pointer-events: none;
 }
 
 /* ===== INTERACTIVE MAP ===== */
@@ -1102,15 +1105,19 @@ body.is-night .countdown-pill {
   color: var(--accent-blue);
 }
 
-/* ===== WEEKLY SPARKLINE ===== */
+/* ===== WEEKLY SPARKLINE (embedded) ===== */
 .weekly-spark-wrap {
-  background: var(--bg-card);
-  border: 1px solid var(--card-border);
-  border-radius: 22px; padding: 16px 14px 12px;
-  backdrop-filter: blur(20px);
-  margin-bottom: 12px;
+  margin: 4px -4px 14px;
+  padding: 8px 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 10px;
 }
-.weekly-spark-svg { width: 100%; height: 80px; display: block; }
+.weekly-spark-sub {
+  font-size: 11px; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 6px; font-weight: 600;
+}
+.weekly-spark-svg { width: 100%; height: 76px; display: block; }
 .spark-bar { transition: opacity 0.3s; }
 .spark-bar:hover { opacity: 0.85; }
 .spark-label { fill: var(--text-tertiary); font-size: 9px; font-weight: 600; text-anchor: middle; }
@@ -1262,6 +1269,38 @@ body.is-night .meteors { opacity: 1; }
 /* ===== WEATHER ICON MORPH ===== */
 .weather-icon-wrap { transition: opacity 0.4s, transform 0.5s cubic-bezier(0.22,1,0.36,1); }
 .weather-icon-wrap.morphing { opacity: 0; transform: scale(0.9) rotate(-10deg); }
+
+/* ===== INSTALL BANNER ===== */
+.install-banner {
+  position: fixed; left: 12px; right: 12px;
+  bottom: calc(90px + var(--safe-bottom));
+  background: linear-gradient(135deg, rgba(138,180,248,0.22), rgba(129,201,149,0.18));
+  border: 1px solid rgba(138,180,248,0.35);
+  border-radius: 20px; padding: 14px 16px;
+  backdrop-filter: blur(24px);
+  display: flex; align-items: center; gap: 12px;
+  z-index: 700; max-width: 460px; margin: 0 auto;
+  transform: translateY(calc(100% + 120px));
+  transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+}
+.install-banner.show { transform: translateY(0); }
+.install-banner .logo {
+  font-size: 28px; flex-shrink: 0;
+}
+.install-banner .txt { flex: 1; min-width: 0; }
+.install-banner .txt strong { color: #fff; font-size: 13px; display: block; margin-bottom: 2px; }
+.install-banner .txt span { color: var(--text-secondary); font-size: 11px; line-height: 1.4; }
+.install-banner .btn {
+  padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 700;
+  background: linear-gradient(135deg, #8ab4f8, #6c9bf2);
+  color: #0f1319; border: none; cursor: pointer;
+  white-space: nowrap;
+}
+.install-banner .close {
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--text-tertiary); font-size: 18px; line-height: 1;
+}
 </style>
 </head>
 <body>
@@ -1276,6 +1315,17 @@ body.is-night .meteors { opacity: 1; }
 
 <!-- Offline banner -->
 <div class="offline-banner" id="offlineBanner">⚠ You are offline — showing cached data</div>
+
+<!-- Install PWA banner (hides browser URL bar when installed) -->
+<div class="install-banner" id="installBanner">
+  <div class="logo">📱</div>
+  <div class="txt">
+    <strong>Install DeepWeather</strong>
+    <span>Full-screen experience — no URL bar, works offline.</span>
+  </div>
+  <button class="btn" onclick="triggerInstall()">Install</button>
+  <button class="close" onclick="dismissInstallBanner()" aria-label="Dismiss">✕</button>
+</div>
 
 <!-- Toast -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1367,12 +1417,13 @@ body.is-night .meteors { opacity: 1; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
         Hourly forecast
       </div>
+      <div class="hourly-chart-card" id="hourlyChartHost"></div>
       <div class="hourly-scroll" id="hourlyScroll"></div>
     </div>
 
     <!-- 10-Day -->
-    <div class="card reveal" style="background:transparent; padding: 0 0 4px 0; border: none; box-shadow: none; backdrop-filter: none;">
-      <div class="card-title" style="padding-left: 4px;">
+    <div class="card reveal">
+      <div class="card-title">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         10-day forecast
       </div>
@@ -1855,24 +1906,42 @@ function generateSmartNarrative(c, d, predictions) {
   `;
 }
 
-// ===== HOURLY CHART =====
-function renderHourlyChart(temps) {
-  const wrap = document.getElementById('hourlyScroll');
-  if (!wrap || !temps.length) return;
+// ===== HOURLY CHART (fixed-width, labels, properly interlinked) =====
+function renderHourlyChart(temps, times) {
+  const host = document.getElementById('hourlyChartHost');
+  if (!host || !temps.length) return;
   const min = Math.min(...temps);
   const max = Math.max(...temps);
   const range = Math.max(max - min, 1);
   const n = temps.length;
-  const stepX = 100 / (n - 1);
+  // viewBox 0..1000 x 0..100, non-uniform preserveAspectRatio so fills entire width
+  const stepX = 1000 / (n - 1);
   const points = temps.map((t, i) => {
     const x = i * stepX;
-    const y = 90 - ((t - min) / range) * 70;
-    return `${x},${y}`;
+    const y = 70 - ((t - min) / range) * 45;
+    return [x, y, t];
   });
-  const path = 'M ' + points.join(' L ');
-  const area = path + ` L 100,100 L 0,100 Z`;
-  const svg = `
-    <svg class="hourly-chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+  const path = 'M ' + points.map(p => `${p[0]},${p[1]}`).join(' L ');
+  const area = path + ` L 1000,100 L 0,100 Z`;
+  // Peak/low markers + labels
+  const peakIdx = temps.indexOf(max);
+  const lowIdx  = temps.indexOf(min);
+  const markers = [peakIdx, lowIdx].map(i => {
+    if (i < 0) return '';
+    const [x, y, t] = points[i];
+    return `<circle cx="${x}" cy="${y}" r="6" fill="#fff" stroke="url(#chartLineGrad)" stroke-width="2"/>
+            <text class="chart-label" x="${x}" y="${y - 10}">${Math.round(t)}°</text>`;
+  }).join('');
+  // Time tick labels (every 4 hrs)
+  let tickLabels = '';
+  if (times && times.length === n) {
+    for (let i = 0; i < n; i += 4) {
+      const label = i === 0 ? 'Now' : new Date(times[i]).toLocaleTimeString([], { hour: '2-digit', hour12: true }).replace(/^0/, '');
+      tickLabels += `<text class="chart-time-label" x="${i * stepX}" y="96">${label}</text>`;
+    }
+  }
+  host.innerHTML = `
+    <svg class="hourly-chart-svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
       <defs>
         <linearGradient id="chartLineGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffd166"/>
@@ -1880,16 +1949,15 @@ function renderHourlyChart(temps) {
           <stop offset="1" stop-color="#c084fc"/>
         </linearGradient>
         <linearGradient id="chartAreaGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="rgba(138,180,248,0.35)"/>
+          <stop offset="0" stop-color="rgba(138,180,248,0.4)"/>
           <stop offset="1" stop-color="rgba(138,180,248,0)"/>
         </linearGradient>
       </defs>
       <path class="chart-area" d="${area}"/>
       <path class="chart-line" d="${path}"/>
+      ${markers}
+      ${tickLabels}
     </svg>`;
-  const existing = wrap.querySelector('.hourly-chart-svg');
-  if (existing) existing.remove();
-  wrap.insertAdjacentHTML('afterbegin', svg);
 }
 
 // ===== DETAIL MODAL =====
@@ -2148,43 +2216,116 @@ window.addEventListener('offline', updateOfflineBanner);
 
 // ===== AUTOCOMPLETE GEOCODING =====
 let acTimer = null;
+let acResults = [];
 function onSearchInput() {
   const q = document.getElementById('searchInput').value.trim();
   const ac = document.getElementById('autocompleteList');
   const list = document.getElementById('cityList');
   clearTimeout(acTimer);
-  if (q.length < 2) {
+  if (q.length === 0) {
     ac.classList.remove('show');
+    ac.innerHTML = '';
     list.style.display = '';
     filterCities();
     return;
   }
+  // Show local matches immediately, then augment with geocoding
   list.style.display = 'none';
+  ac.classList.add('show');
+  ac.innerHTML = '<div class="autocomplete-item" style="color:var(--text-tertiary);"><span>🔍</span><span>Searching worldwide...</span></div>';
   acTimer = setTimeout(async () => {
     try {
-      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`);
+      const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=10&language=en&format=json`);
       const d = await r.json();
-      if (!d.results || !d.results.length) { ac.innerHTML = '<div class="autocomplete-item" style="color:var(--text-tertiary);">No matches</div>'; ac.classList.add('show'); return; }
-      ac.innerHTML = d.results.map(r => {
+      acResults = d.results || [];
+      if (!acResults.length) {
+        ac.innerHTML = '<div class="autocomplete-item" style="color:var(--text-tertiary);"><span>🗺️</span><span>No matches for "' + q.replace(/</g,'&lt;') + '"</span></div>';
+        return;
+      }
+      ac.innerHTML = acResults.map((r, i) => {
         const flag = countryFlag(r.country_code);
-        return `<div class="autocomplete-item" onclick="selectCity(${r.latitude},${r.longitude},'${r.name.replace(/'/g, "\\'")}','${(r.country || '').replace(/'/g, "\\'")}')">
+        const region = [r.admin1, r.country].filter(Boolean).join(', ');
+        return `<div class="autocomplete-item" data-idx="${i}">
           <span class="autocomplete-flag">${flag}</span>
-          <div>
-            <div class="autocomplete-name">${r.name}</div>
-            <div class="autocomplete-region" style="margin-left:0;">${r.admin1 || ''} ${r.country || ''}</div>
+          <div style="flex:1; min-width:0;">
+            <div class="autocomplete-name">${escapeHtml(r.name)}</div>
+            <div class="autocomplete-region" style="margin-left:0;">${escapeHtml(region)}</div>
           </div>
+          ${r.population ? `<span style="font-size:10px;color:var(--text-tertiary);">${formatPop(r.population)}</span>` : ''}
         </div>`;
       }).join('');
-      ac.classList.add('show');
     } catch (e) {
-      ac.innerHTML = '<div class="autocomplete-item" style="color:var(--accent-pink);">Search failed</div>';
-      ac.classList.add('show');
+      ac.innerHTML = '<div class="autocomplete-item" style="color:var(--accent-pink);"><span>⚠️</span><span>Search failed — check connection</span></div>';
     }
-  }, 280);
+  }, 220);
+}
+function escapeHtml(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function formatPop(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+  return n;
 }
 function countryFlag(code) {
   if (!code || code.length !== 2) return '🌍';
   return code.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
+// Event delegation for autocomplete clicks + Enter key handling
+document.addEventListener('DOMContentLoaded', () => {
+  const ac = document.getElementById('autocompleteList');
+  const input = document.getElementById('searchInput');
+  if (ac) {
+    ac.addEventListener('click', e => {
+      const item = e.target.closest('.autocomplete-item');
+      if (!item || !item.dataset.idx) return;
+      const r = acResults[+item.dataset.idx];
+      if (!r) return;
+      haptic();
+      selectCity(r.latitude, r.longitude, r.name, r.country || '');
+      ac.classList.remove('show');
+      input.value = '';
+    });
+  }
+  if (input) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && acResults.length > 0) {
+        const r = acResults[0];
+        haptic();
+        selectCity(r.latitude, r.longitude, r.name, r.country || '');
+        document.getElementById('autocompleteList').classList.remove('show');
+        input.value = '';
+        input.blur();
+      }
+    });
+  }
+});
+
+// ===== PWA INSTALL PROMPT =====
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+function showInstallBanner() {
+  if (localStorage.getItem('dw_install_dismissed') === '1') return;
+  const b = document.getElementById('installBanner');
+  if (b) b.classList.add('show');
+}
+function dismissInstallBanner() {
+  const b = document.getElementById('installBanner');
+  if (b) b.classList.remove('show');
+  localStorage.setItem('dw_install_dismissed', '1');
+}
+async function triggerInstall() {
+  if (!deferredInstallPrompt) {
+    showToast('To remove the URL bar: tap your browser menu → "Add to Home Screen"', 'success');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  dismissInstallBanner();
+  if (outcome === 'accepted') showToast('App installed — enjoy the full-screen experience!', 'success');
 }
 
 // ===== WIND COMPASS =====
@@ -2325,16 +2466,13 @@ function buildWeeklySparkline(daily) {
     bars += `
       <g class="spark-bar">
         <line x1="${cx}" y1="${yHi}" x2="${cx}" y2="${yLo}" stroke="url(#sparkGrad)" stroke-width="${w * 0.4}" stroke-linecap="round"/>
-        <text class="spark-temp" x="${cx}" y="${yHi - 2}">${Math.round(highs[i])}°</text>
+        <text class="spark-temp" x="${cx}" y="${yHi - 2}">${fmtTemp(highs[i])}°</text>
         <text class="spark-label" x="${cx}" y="74">${dayName.slice(0,3)}</text>
       </g>`;
   }
   return `
-    <div class="weekly-spark-wrap reveal">
-      <div class="card-title" style="margin-bottom:10px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg>
-        Weekly trend
-      </div>
+    <div class="weekly-spark-wrap">
+      <div class="weekly-spark-sub">Weekly trend</div>
       <svg class="weekly-spark-svg" viewBox="0 0 100 80" preserveAspectRatio="none">
         <defs>
           <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
@@ -2481,13 +2619,14 @@ function animateNumber(el, from, to, suffix = '', duration = 700) {
   requestAnimationFrame(tick);
 }
 
-// ===== PARALLAX MAIN TEMP =====
+// ===== PARALLAX MAIN TEMP (subtle scale-down, no Y translation that would overlap) =====
 window.addEventListener('scroll', () => {
   const mw = document.querySelector('.main-weather');
   if (!mw) return;
-  const y = Math.min(window.scrollY * 0.3, 80);
-  mw.style.transform = `translateY(${y}px)`;
-  mw.style.opacity = Math.max(0.3, 1 - window.scrollY / 400);
+  const s = Math.max(0.88, 1 - window.scrollY / 1200);
+  const op = Math.max(0.55, 1 - window.scrollY / 600);
+  mw.style.transform = `scale(${s})`;
+  mw.style.opacity = op;
 }, { passive: true });
 
 // ===== FETCH =====
@@ -2588,6 +2727,7 @@ function renderWeather(data, city) {
 
       let hourlyHtml = '';
       const temps = [];
+      const timeLabels = [];
       for (let i = 0; i < 24; i++) {
         const hourIndex = currentHourIndex + i;
         if (hourIndex >= h.time.length) break;
@@ -2596,17 +2736,18 @@ function renderWeather(data, city) {
         const info = getWeatherInfo(h.weather_code[hourIndex]);
         const displayTemp = i === 0 ? c.temperature_2m : predictions[i-1];
         temps.push(displayTemp);
+        timeLabels.push(h.time[hourIndex]);
         const precip = h.precipitation_probability ? h.precipitation_probability[hourIndex] : 0;
         hourlyHtml += `
           <div class="hourly-item">
-            <div class="h-temp">${Math.round(displayTemp)}°</div>
+            <div class="h-temp">${fmtTemp(displayTemp)}°</div>
             <div class="h-icon">${info.icon}</div>
             <div class="h-precip">${precip}%</div>
             <div class="h-time">${timeStr}</div>
           </div>`;
       }
       document.getElementById('hourlyScroll').innerHTML = hourlyHtml;
-      renderHourlyChart(temps);
+      renderHourlyChart(temps, timeLabels);
     } else {
       document.getElementById('predText').innerHTML = generateSmartNarrative(c, d, null);
     }
@@ -2877,6 +3018,13 @@ updateOfflineBanner();
 updateMeteorState();
 updateShakeState();
 updateThemeOverride();
+
+// iOS install banner fallback (beforeinstallprompt doesn't fire on iOS)
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if (isIOS && !isStandalone) {
+  setTimeout(() => showInstallBanner(), 4000);
+}
 // Lazy resume audio on first user interaction (browser autoplay policy)
 document.addEventListener('click', () => {
   if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
