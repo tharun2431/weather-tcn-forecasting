@@ -907,13 +907,11 @@ body.is-night .stars { opacity: 0.5; }
     </div>
 
     <div class="card">
-      <div class="card-title">How predictions work ⚡</div>
+      <div class="card-title">Model Architecture & Edge Deployment ⚡</div>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-        <strong>Phase 1: Learning (Laptop/Desktop)</strong><br>
-        Think of this as studying for a massive exam. We took 8 years of historical weather records (over 420,000 data points) and fed them into complex Deep Learning architectures like LSTM and TCN. These powerful models ran on a computer, finding hidden algorithms in how temperature shifts over time. Once they learned these "laws of weather," their final knowledge was saved into a compact, specialized file.<br><br>
+        <strong>Offline Training (Compute Node):</strong> The underlying networks (TCN, LSTM, and Stacking Ensembles) underwent supervised learning over 420,551 hourly observations from the Jena Climate Dataset. The models iteratively optimized their parameter weights to capture complex spatiotemporal dependencies and long-term meteorological patterns.<br><br>
         
-        <strong>Phase 2: Predicting (In this App)</strong><br>
-        Think of this as taking the exam on the fly. We took that saved "knowledge file" and embedded it directly into this app. Now, whenever you search for a city, the app grabs just the last 24 hours of local weather and feeds it into the embedded model. The model instantly calculates the next 24 hours. Because the model already learned the rules, all of this complex math happens <strong>locally and directly inside your phone or browser</strong>—no external supercomputers required!
+        <strong>Online Inference (Edge Node):</strong> To achieve zero-latency forecasting without backend infrastructure overhead, the trained LSTM weights were serialized into the <span style="color:var(--accent-blue);">ONNX (Open Neural Network Exchange)</span> format. This Progressive Web App intercepts standard REST API calls, isolates the T-24hr sequential vector, and executes a localized forward pass using WebAssembly. This ensures secure, real-time edge computing directly on the client device.
       </p>
     </div>
   </div>
