@@ -6,6 +6,7 @@
   "start_url": "/weather-tcn-forecasting/",
   "scope": "/weather-tcn-forecasting/",
   "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
   "background_color": "#0f0f1a",
   "theme_color": "#0f0f1a",
   "orientation": "portrait",
