@@ -182,7 +182,7 @@
     
     <div class="header">
       <svg class="back-btn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      <div class="location" onclick="showScreen('searchScreen')"><span id="mainCity">Jena</span></div>
+      <div class="location" onclick="showScreen('searchScreen')"><span id="cityName">Jena</span></div>
     </div>
     
       <div class="live-badge" id="aiStatusBadge">
@@ -560,10 +560,6 @@ function renderWeather(data, city) {
   else if (uvIndex >= 3) { uvLevel = 'Moderate'; uvColor = '#eab308'; }
 
   // Material You Shapes Grid
-  const feelsLike = Math.round(c.apparent_temperature);
-  const humidity = c.relative_humidity_2m;
-  const wind = c.wind_speed_10m;
-  const pressure = Math.round(c.pressure_msl);
   const visibility = "16"; // mock
   const aqi = 3; // mock
   
