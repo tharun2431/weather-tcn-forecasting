@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v22-clean-rewrite';
+const CACHE_NAME = 'deepweather-v23-model-wording';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
