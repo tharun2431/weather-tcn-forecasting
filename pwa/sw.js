@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v21-material-screens';
+const CACHE_NAME = 'deepweather-v22-clean-rewrite';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
