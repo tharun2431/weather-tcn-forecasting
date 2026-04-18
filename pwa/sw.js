@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v15-temporal-pills';
+const CACHE_NAME = 'deepweather-v16-material-you';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
