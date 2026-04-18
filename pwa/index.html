@@ -363,7 +363,7 @@
     <div class="loading-icons">
       <div class="orbit"></div>
       <div class="orbit"></div>
-      <div class="center-icon">≡ƒîñ∩╕Å</div>
+      <div class="center-icon">🌤️</div>
     </div>
     <div class="loading-brand">DeepWeather</div>
     <p>Fetching live weather data...</p>
@@ -385,10 +385,10 @@
     </div>
 
     <div class="main-weather">
-      <div class="weather-icon" id="mainIcon">ΓÿÇ∩╕Å</div>
-      <div class="main-temp" id="mainTemp">--<sup>┬░</sup></div>
+      <div class="weather-icon" id="mainIcon">☀️</div>
+      <div class="main-temp" id="mainTemp">--<sup>°</sup></div>
       <div class="weather-desc" id="mainDesc">Loading</div>
-      <div class="temp-range">H: <span id="hiTemp">--┬░</span>  L: <span id="loTemp">--┬░</span></div>
+      <div class="temp-range">H: <span id="hiTemp">--°</span>  L: <span id="loTemp">--°</span></div>
     </div>
 
     <div class="predict-card">
@@ -423,15 +423,15 @@
 
   <!-- ===== MODELS SCREEN ===== -->
   <div id="modelsScreen" class="screen">
-    <h2 class="section-title">≡ƒºá Deep Learning Models</h2>
-    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">This app uses four deep learning models trained on 420,551 hourly observations from the Jena Climate dataset (2009ΓÇô2016).</p>
+    <h2 class="section-title">🧠 Deep Learning Models</h2>
+    <p style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">This app uses four deep learning models trained on 420,551 hourly observations from the Jena Climate dataset (2009–2016).</p>
 
     <div class="model-card">
       <h3>Stacking Ensemble <span class="model-tag tag-best">BEST</span></h3>
       <p>A Ridge regression meta-learner that combines LSTM, TCN, and TCN-LSTM predictions with learned optimal weights. Achieves the best accuracy by leveraging complementary strengths of each architecture.</p>
       <div class="model-stats">
-        <div class="model-stat"><div class="stat-val">0.37┬░C</div><div class="stat-label">MAE</div></div>
-        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R┬▓</div></div>
+        <div class="model-stat"><div class="stat-val">0.37°C</div><div class="stat-label">MAE</div></div>
+        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R²</div></div>
         <div class="model-stat"><div class="stat-val">0.0043</div><div class="stat-label">MSE</div></div>
       </div>
     </div>
@@ -440,18 +440,18 @@
       <h3>LSTM <span class="model-tag tag-base">BASELINE</span></h3>
       <p>Long Short-Term Memory network with 2 layers of 128 hidden units each. Excels at capturing smooth, long-range temporal dependencies in temperature curves.</p>
       <div class="model-stats">
-        <div class="model-stat"><div class="stat-val">0.38┬░C</div><div class="stat-label">MAE</div></div>
-        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R┬▓</div></div>
+        <div class="model-stat"><div class="stat-val">0.38°C</div><div class="stat-label">MAE</div></div>
+        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R²</div></div>
         <div class="model-stat"><div class="stat-val">214K</div><div class="stat-label">PARAMS</div></div>
       </div>
     </div>
 
     <div class="model-card">
       <h3>TCN <span class="model-tag tag-base">BASELINE</span></h3>
-      <p>Temporal Convolutional Network with dilated causal convolutions. 6├ù faster to train than LSTM while maintaining competitive accuracy.</p>
+      <p>Temporal Convolutional Network with dilated causal convolutions. 6× faster to train than LSTM while maintaining competitive accuracy.</p>
       <div class="model-stats">
-        <div class="model-stat"><div class="stat-val">0.41┬░C</div><div class="stat-label">MAE</div></div>
-        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R┬▓</div></div>
+        <div class="model-stat"><div class="stat-val">0.41°C</div><div class="stat-label">MAE</div></div>
+        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R²</div></div>
         <div class="model-stat"><div class="stat-val">121K</div><div class="stat-label">PARAMS</div></div>
       </div>
     </div>
@@ -460,8 +460,8 @@
       <h3>TCN-LSTM Hybrid <span class="model-tag tag-hybrid">HYBRID</span></h3>
       <p>Novel architecture combining TCN encoder (feature extraction via dilated convolutions) with LSTM decoder (sequential dependency modelling). Research innovation of this project.</p>
       <div class="model-stats">
-        <div class="model-stat"><div class="stat-val">0.42┬░C</div><div class="stat-label">MAE</div></div>
-        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R┬▓</div></div>
+        <div class="model-stat"><div class="stat-val">0.42°C</div><div class="stat-label">MAE</div></div>
+        <div class="model-stat"><div class="stat-val">0.99</div><div class="stat-label">R²</div></div>
         <div class="model-stat"><div class="stat-val">174K</div><div class="stat-label">PARAMS</div></div>
       </div>
     </div>
@@ -469,7 +469,7 @@
 
   <!-- ===== SEARCH SCREEN ===== -->
   <div id="searchScreen" class="screen">
-    <h2 class="section-title">≡ƒöì Search City</h2>
+    <h2 class="section-title">🔍 Search City</h2>
     <div class="search-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       <input type="text" class="search-input" id="searchInput" placeholder="Search city..." oninput="filterCities()">
@@ -480,23 +480,23 @@
   <!-- ===== ABOUT SCREEN ===== -->
   <div id="aboutScreen" class="screen">
     <div class="about-header">
-      <div class="about-icon">≡ƒîñ∩╕Å</div>
+      <div class="about-icon">🌤️</div>
       <h2>DeepWeather</h2>
       <p>Deep Learning Weather Forecasting</p>
-      <p style="color:var(--text-tertiary);margin-top:4px;">v1.0 ┬╖ CMP-L016 Project #28</p>
+      <p style="color:var(--text-tertiary);margin-top:4px;">v1.0 · CMP-L016 Project #28</p>
     </div>
 
     <a class="about-link" href="https://huggingface.co/spaces/Tharunp2431/weather-forecasting" target="_blank">
-      <span>≡ƒûÑ∩╕Å &nbsp;Full Dashboard (Hugging Face)</span>
-      <span class="arrow">ΓåÆ</span>
+      <span>🖥️ &nbsp;Full Dashboard (Hugging Face)</span>
+      <span class="arrow">→</span>
     </a>
     <a class="about-link" href="https://github.com/tharun2431/weather-tcn-forecasting" target="_blank">
-      <span>≡ƒôé &nbsp;GitHub Repository</span>
-      <span class="arrow">ΓåÆ</span>
+      <span>📂 &nbsp;GitHub Repository</span>
+      <span class="arrow">→</span>
     </a>
     <a class="about-link" href="#">
-      <span>≡ƒôä &nbsp;IEEE Research Paper</span>
-      <span class="arrow">ΓåÆ</span>
+      <span>📄 &nbsp;IEEE Research Paper</span>
+      <span class="arrow">→</span>
     </a>
 
     <div class="card" style="margin-top: 20px;">
@@ -590,29 +590,29 @@ function updateWeatherTheme(code) {
 function getWeatherInfo(code) {
 
   const map = {
-    0:  { icon: 'ΓÿÇ∩╕Å', desc: 'Clear Sky' },
-    1:  { icon: '≡ƒîñ∩╕Å', desc: 'Mainly Clear' },
-    2:  { icon: 'Γ¢à', desc: 'Partly Cloudy' },
-    3:  { icon: 'Γÿü∩╕Å', desc: 'Overcast' },
-    45: { icon: '≡ƒî½∩╕Å', desc: 'Foggy' },
-    48: { icon: '≡ƒî½∩╕Å', desc: 'Rime Fog' },
-    51: { icon: '≡ƒîª∩╕Å', desc: 'Light Drizzle' },
-    53: { icon: '≡ƒîª∩╕Å', desc: 'Moderate Drizzle' },
-    55: { icon: '≡ƒîº∩╕Å', desc: 'Dense Drizzle' },
-    61: { icon: '≡ƒîº∩╕Å', desc: 'Light Rain' },
-    63: { icon: '≡ƒîº∩╕Å', desc: 'Moderate Rain' },
-    65: { icon: '≡ƒîº∩╕Å', desc: 'Heavy Rain' },
-    71: { icon: '≡ƒî¿∩╕Å', desc: 'Light Snow' },
-    73: { icon: '≡ƒî¿∩╕Å', desc: 'Moderate Snow' },
-    75: { icon: 'Γ¥ä∩╕Å', desc: 'Heavy Snow' },
-    80: { icon: '≡ƒîª∩╕Å', desc: 'Rain Showers' },
-    81: { icon: '≡ƒîº∩╕Å', desc: 'Moderate Showers' },
-    82: { icon: 'Γ¢ê∩╕Å', desc: 'Violent Showers' },
-    95: { icon: 'Γ¢ê∩╕Å', desc: 'Thunderstorm' },
-    96: { icon: 'Γ¢ê∩╕Å', desc: 'Thunderstorm with Hail' },
-    99: { icon: 'Γ¢ê∩╕Å', desc: 'Severe Thunderstorm' },
+    0:  { icon: '☀️', desc: 'Clear Sky' },
+    1:  { icon: '🌤️', desc: 'Mainly Clear' },
+    2:  { icon: '⛅', desc: 'Partly Cloudy' },
+    3:  { icon: '☁️', desc: 'Overcast' },
+    45: { icon: '🌫️', desc: 'Foggy' },
+    48: { icon: '🌫️', desc: 'Rime Fog' },
+    51: { icon: '🌦️', desc: 'Light Drizzle' },
+    53: { icon: '🌦️', desc: 'Moderate Drizzle' },
+    55: { icon: '🌧️', desc: 'Dense Drizzle' },
+    61: { icon: '🌧️', desc: 'Light Rain' },
+    63: { icon: '🌧️', desc: 'Moderate Rain' },
+    65: { icon: '🌧️', desc: 'Heavy Rain' },
+    71: { icon: '🌨️', desc: 'Light Snow' },
+    73: { icon: '🌨️', desc: 'Moderate Snow' },
+    75: { icon: '❄️', desc: 'Heavy Snow' },
+    80: { icon: '🌦️', desc: 'Rain Showers' },
+    81: { icon: '🌧️', desc: 'Moderate Showers' },
+    82: { icon: '⛈️', desc: 'Violent Showers' },
+    95: { icon: '⛈️', desc: 'Thunderstorm' },
+    96: { icon: '⛈️', desc: 'Thunderstorm with Hail' },
+    99: { icon: '⛈️', desc: 'Severe Thunderstorm' },
   };
-  return map[code] || { icon: '≡ƒîñ∩╕Å', desc: 'Fair' };
+  return map[code] || { icon: '🌤️', desc: 'Fair' };
 }
 
 // ===== FETCH WEATHER =====
@@ -630,7 +630,7 @@ async function fetchWeather(city) {
   } catch (e) {
     console.error('Weather fetch failed:', e);
     document.getElementById('loadingScreen').innerHTML = `
-      <p style="color: var(--accent-pink);">ΓÜá∩╕Å Failed to fetch weather data</p>
+      <p style="color: var(--accent-pink);">⚠️ Failed to fetch weather data</p>
       <p style="font-size:12px;color:var(--text-tertiary);margin-top:8px;">Check your internet connection and try again</p>
     `;
   }
@@ -649,10 +649,10 @@ function renderWeather(data, city) {
   const weatherInfo = getWeatherInfo(c.weather_code);
   updateWeatherTheme(c.weather_code);
   document.getElementById('mainIcon').textContent = weatherInfo.icon;
-  document.getElementById('mainTemp').innerHTML = `${Math.round(c.temperature_2m)}<sup>┬░</sup>`;
+  document.getElementById('mainTemp').innerHTML = `${Math.round(c.temperature_2m)}<sup>°</sup>`;
   document.getElementById('mainDesc').textContent = weatherInfo.desc;
-  document.getElementById('hiTemp').textContent = `${Math.round(d.temperature_2m_max[0])}┬░`;
-  document.getElementById('loTemp').textContent = `${Math.round(d.temperature_2m_min[0])}┬░`;
+  document.getElementById('hiTemp').textContent = `${Math.round(d.temperature_2m_max[0])}°`;
+  document.getElementById('loTemp').textContent = `${Math.round(d.temperature_2m_min[0])}°`;
 
   // Edge Inference Magic
   const currentHourIndex = h.time.indexOf(h.time.find(t => new Date(t).getTime() >= new Date().setMinutes(0, 0, 0)));
@@ -666,7 +666,7 @@ function renderWeather(data, city) {
       const tempTrend = predictions[5] > c.temperature_2m ? 'rise' : 'drop';
       const diff = Math.abs(predictions[5] - c.temperature_2m).toFixed(1);
       document.getElementById('predText').textContent = 
-        `Your trained LSTM PyTorch model is running locally. It predicts temperature will ${tempTrend} by ${diff}┬░C over the next 6 hours.`;
+        `Your trained LSTM PyTorch model is running locally. It predicts temperature will ${tempTrend} by ${diff}°C over the next 6 hours.`;
         
       // Overwrite the API HTML temperatures with our TRUE MODEL PREDICTIONS!
       let hourlyHtml = '';
@@ -684,7 +684,7 @@ function renderWeather(data, city) {
           <div class="hourly-item ${i === 0 ? 'now' : ''}">
             <div class="h-time">${timeStr}</div>
             <div class="h-icon">${info.icon}</div>
-            <div class="h-temp" style="${i > 0 ? 'color: var(--accent-pink);' : ''}">${Math.round(displayTemp)}┬░</div>
+            <div class="h-temp" style="${i > 0 ? 'color: var(--accent-pink);' : ''}">${Math.round(displayTemp)}°</div>
           </div>`;
       }
       document.getElementById('hourlyScroll').innerHTML = hourlyHtml;
@@ -711,7 +711,7 @@ function renderWeather(data, city) {
         <div class="d-day ${i === 0 ? 'today' : ''}">${dayName}</div>
         <div class="d-icon">${info.icon}</div>
         <div class="d-bar-bg"><div class="d-bar-fill" style="left:${left}%;width:${Math.max(width, 8)}%"></div></div>
-        <div class="d-temps"><span class="d-hi">${hi}┬░</span><span class="d-lo">${lo}┬░</span></div>
+        <div class="d-temps"><span class="d-hi">${hi}°</span><span class="d-lo">${lo}°</span></div>
       </div>`;
   }
   document.getElementById('dailyForecast').innerHTML = dailyHtml;
@@ -733,29 +733,29 @@ function renderWeather(data, city) {
 
   document.getElementById('detailGrid').innerHTML = `
     <div class="detail-card">
-      <div class="d-label">≡ƒîí∩╕Å FEELS LIKE</div>
-      <div class="d-value">${feelsLike}┬░</div>
+      <div class="d-label">🌡️ FEELS LIKE</div>
+      <div class="d-value">${feelsLike}°</div>
       <div class="d-note">${feelsLike < Math.round(c.temperature_2m) ? 'Wind makes it feel cooler' : feelsLike > Math.round(c.temperature_2m) ? 'Humidity makes it feel warmer' : 'Similar to actual temperature'}</div>
     </div>
     <div class="detail-card">
-      <div class="d-label">≡ƒÆº HUMIDITY</div>
+      <div class="d-label">💧 HUMIDITY</div>
       <div class="d-value">${humidity}<span class="d-unit">%</span></div>
       <div class="d-note">${humidity > 70 ? 'Humid conditions' : humidity < 30 ? 'Dry conditions' : 'Comfortable level'}</div>
     </div>
     <div class="detail-card">
-      <div class="d-label">≡ƒÆ¿ WIND</div>
+      <div class="d-label">💨 WIND</div>
       <div class="d-value">${wind}<span class="d-unit"> km/h</span></div>
       <div class="d-note">${wind > 40 ? 'Strong winds' : wind > 20 ? 'Moderate breeze' : 'Light breeze'}</div>
     </div>
     <div class="detail-card">
-      <div class="d-label">≡ƒôè PRESSURE</div>
+      <div class="d-label">📊 PRESSURE</div>
       <div class="d-value">${Math.round(pressure)}<span class="d-unit"> hPa</span></div>
       <div class="d-note">${pressure > 1020 ? 'High pressure system' : pressure < 1000 ? 'Low pressure system' : 'Normal pressure'}</div>
     </div>
     <div class="detail-card">
-      <div class="d-label">≡ƒîà SUN</div>
-      <div class="d-value" style="font-size:16px;">Γåæ ${sunrise}</div>
-      <div class="d-note" style="font-size:14px;font-weight:500;color:var(--text-secondary);">Γåô ${sunset}</div>
+      <div class="d-label">🌅 SUN</div>
+      <div class="d-value" style="font-size:16px;">↑ ${sunrise}</div>
+      <div class="d-note" style="font-size:14px;font-weight:500;color:var(--text-secondary);">↓ ${sunset}</div>
     </div>
   `;
 
