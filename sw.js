@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v23-model-wording';
+const CACHE_NAME = 'deepweather-v24-academic-text';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
