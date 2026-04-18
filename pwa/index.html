@@ -704,13 +704,27 @@ function renderWeather(data, city) {
     const info = getWeatherInfo(d.weather_code[i]);
     const lo = Math.round(d.temperature_2m_min[i]);
     const hi = Math.round(d.temperature_2m_max[i]);
-    const left = ((d.temperature_2m_min[i] - globalMin) / range) * 100;
-    const width = ((d.temperature_2m_max[i] - d.temperature_2m_min[i]) / range) * 100;
+    // Get temporal hourly datums if available
+    let morn = "--", aft = "--", night = "--";
+    const dateStr = d.time[i]; // e.g. "2023-10-25"
+    if (h && h.time) {
+      const idxMorn = h.time.findIndex(t => t.startsWith(dateStr) && t.includes("08:00"));
+      const idxAft = h.time.findIndex(t => t.startsWith(dateStr) && t.includes("14:00"));
+      const idxNight = h.time.findIndex(t => t.startsWith(dateStr) && t.includes("20:00"));
+      if (idxMorn !== -1) morn = Math.round(h.temperature_2m[idxMorn]);
+      if (idxAft !== -1) aft = Math.round(h.temperature_2m[idxAft]);
+      if (idxNight !== -1) night = Math.round(h.temperature_2m[idxNight]);
+    }
+    
     dailyHtml += `
       <div class="daily-item">
         <div class="d-day ${i === 0 ? 'today' : ''}">${dayName}</div>
         <div class="d-icon">${info.icon}</div>
-        <div class="d-bar-bg"><div class="d-bar-fill" style="left:${left}%;width:${Math.max(width, 8)}%"></div></div>
+        <div class="d-temporal">
+          <div class="t-pill"><span>8 AM</span><span>${morn}°</span></div>
+          <div class="t-pill"><span>2 PM</span><span>${aft}°</span></div>
+          <div class="t-pill"><span>8 PM</span><span>${night}°</span></div>
+        </div>
         <div class="d-temps"><span class="d-hi">${hi}°</span><span class="d-lo">${lo}°</span></div>
       </div>`;
   }
