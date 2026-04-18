@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v12-vision-pro';
+const CACHE_NAME = 'deepweather-v13-premium-emojis';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
