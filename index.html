@@ -909,8 +909,11 @@ body.is-night .stars { opacity: 0.5; }
     <div class="card">
       <div class="card-title">How predictions work ⚡</div>
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">
-        <strong>On Laptop (Backend):</strong> The full Stacking Ensemble models run dynamically in Python, processing massive historical datasets to forecast overarching trends.<br><br>
-        <strong>In this App (Edge UI):</strong> The core trained LSTM model was exported to an <span style="color:var(--accent-blue);">ONNX format</span>. When you load a city, the app grabs the last 24hrs of data and feeds it into the ONNX model using WebAssembly. The model calculates the next 24 hours of temperatures <strong>natively on your device</strong> without relying on an external inference server!
+        <strong>Phase 1: Learning (Laptop/Desktop)</strong><br>
+        Think of this as studying for a massive exam. We took 8 years of historical weather records (over 420,000 data points) and fed them into complex Deep Learning architectures like LSTM and TCN. These powerful models ran on a computer, finding hidden algorithms in how temperature shifts over time. Once they learned these "laws of weather," their final knowledge was saved into a compact, specialized file.<br><br>
+        
+        <strong>Phase 2: Predicting (In this App)</strong><br>
+        Think of this as taking the exam on the fly. We took that saved "knowledge file" and embedded it directly into this app. Now, whenever you search for a city, the app grabs just the last 24 hours of local weather and feeds it into the embedded model. The model instantly calculates the next 24 hours. Because the model already learned the rules, all of this complex math happens <strong>locally and directly inside your phone or browser</strong>—no external supercomputers required!
       </p>
     </div>
   </div>
