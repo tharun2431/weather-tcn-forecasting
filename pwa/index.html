@@ -444,7 +444,7 @@ async function fetchWeather(city) {
 
   try {
     // Fetch 7 days of past data (needed for model) and 7 days of forecast
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,pressure_msl,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,relative_humidity_2m,dew_point_2m,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,uv_index_max&timezone=auto&past_days=7&forecast_days=7`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,pressure_msl,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation_probability,relative_humidity_2m,dew_point_2m,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,uv_index_max,precipitation_probability_max&timezone=auto&past_days=7&forecast_days=10`;
     const res = await fetch(url);
     const data = await res.json();
     renderWeather(data, city);
@@ -529,7 +529,7 @@ function renderWeather(data, city) {
     const info = getWeatherInfo(d.weather_code[i]);
     const lo = Math.round(d.temperature_2m_min[i]);
     const hi = Math.round(d.temperature_2m_max[i]);
-    const precip = d.precipitation_probability_max ? d.precipitation_probability_max[i] : (globalMax > 15 ? 10 : 0);
+    const precip = d.precipitation_probability_max ? d.precipitation_probability_max[i] : (hi > 15 ? 10 : 0);
     
     dailyHtml += `
       <div class="daily-pill ${i === 0 ? 'today' : ''}">
