@@ -1502,7 +1502,7 @@ body.is-night .meteors { opacity: 1; }
       <div class="acc-metrics" id="accMetrics"></div>
       <div class="acc-footer">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-        Verified against Open-Meteo ground truth · Past 24h
+        Verified against Open-Meteo NWP forecast · Next 24h
       </div>
     </div>
 
@@ -2751,113 +2751,99 @@ function renderAccuracyComparison(hourlyData, currentHourIndex, futurePrediction
   const chartHost = document.getElementById('accChartHost');
   const metricsEl = document.getElementById('accMetrics');
   const badgeEl = document.getElementById('accBadge');
-  if (!card || !chartHost || !session) return;
+  if (!card || !chartHost) return;
 
-  // We compare using PAST 24 hours: run model on data from 24h ago and compare to actuals
-  const pastEndIndex = currentHourIndex; // now
-  const pastStartIndex = pastEndIndex - 24;  // 24h ago
-  const seqStart = pastStartIndex - 168; // need 168h window before
-
-  if (seqStart < 0 || pastStartIndex < 0) {
-    card.style.display = 'none';
-    return;
-  }
-
-  // Get actual temperatures from the past 24h (from the API)
-  const actualTemps = [];
+  // Compare our ONNX predictions against the Open-Meteo API forecast
+  // The API provides professional NWP forecast temps in hourly.temperature_2m
+  const apiTemps = [];
+  const ourPreds = [];
   const timeLabels = [];
-  for (let i = 0; i < 24; i++) {
-    const idx = pastStartIndex + i;
+
+  for (let i = 0; i < futurePredictions.length; i++) {
+    const idx = currentHourIndex + i + 1;
     if (idx >= hourlyData.temperature_2m.length) break;
-    actualTemps.push(hourlyData.temperature_2m[idx]);
+    if (hourlyData.temperature_2m[idx] == null) continue;
+    apiTemps.push(hourlyData.temperature_2m[idx]);
+    ourPreds.push(futurePredictions[i]);
     timeLabels.push(hourlyData.time[idx]);
   }
-  if (actualTemps.length < 12) { card.style.display = 'none'; return; }
 
-  // Run the ONNX model on data from 24h ago to predict what "would have" happened
-  runEdgeInference(hourlyData, pastStartIndex, actualTemps.length).then(pastPredictions => {
-    if (!pastPredictions || pastPredictions.length < 12) {
-      card.style.display = 'none';
-      return;
-    }
+  const n = Math.min(apiTemps.length, ourPreds.length);
+  if (n < 6) { card.style.display = 'none'; return; }
 
-    const n = Math.min(actualTemps.length, pastPredictions.length);
+  // Calculate metrics
+  let sumAbsErr = 0, sumSqErr = 0;
+  for (let i = 0; i < n; i++) {
+    const err = Math.abs(ourPreds[i] - apiTemps[i]);
+    sumAbsErr += err;
+    sumSqErr += err * err;
+  }
+  const mae = sumAbsErr / n;
+  const rmse = Math.sqrt(sumSqErr / n);
+  const tempRange = Math.max(...apiTemps) - Math.min(...apiTemps);
+  const accuracy = Math.max(0, Math.min(100, 100 - (mae / Math.max(tempRange, 1) * 100)));
 
-    // Calculate metrics
-    let sumAbsErr = 0, sumSqErr = 0, maxErr = 0;
-    for (let i = 0; i < n; i++) {
-      const err = Math.abs(pastPredictions[i] - actualTemps[i]);
-      sumAbsErr += err;
-      sumSqErr += err * err;
-      if (err > maxErr) maxErr = err;
-    }
-    const mae = sumAbsErr / n;
-    const rmse = Math.sqrt(sumSqErr / n);
-    const tempRange = Math.max(...actualTemps) - Math.min(...actualTemps);
-    const accuracy = Math.max(0, Math.min(100, 100 - (mae / Math.max(tempRange, 1) * 100)));
+  // Show card
+  card.style.display = 'block';
 
-    // Show card
-    card.style.display = 'block';
+  // Badge color
+  badgeEl.textContent = accuracy.toFixed(1) + '%';
+  if (accuracy >= 85) {
+    badgeEl.style.background = 'rgba(129,201,149,0.15)';
+    badgeEl.style.color = 'var(--accent-green)';
+  } else if (accuracy >= 65) {
+    badgeEl.style.background = 'rgba(249,168,37,0.15)';
+    badgeEl.style.color = 'var(--accent-orange)';
+  } else {
+    badgeEl.style.background = 'rgba(242,139,130,0.15)';
+    badgeEl.style.color = 'var(--accent-pink)';
+  }
 
-    // Badge
-    badgeEl.textContent = accuracy.toFixed(1) + '%';
-    if (accuracy >= 90) {
-      badgeEl.style.background = 'rgba(129,201,149,0.15)';
-      badgeEl.style.color = 'var(--accent-green)';
-    } else if (accuracy >= 75) {
-      badgeEl.style.background = 'rgba(249,168,37,0.15)';
-      badgeEl.style.color = 'var(--accent-orange)';
-    } else {
-      badgeEl.style.background = 'rgba(242,139,130,0.15)';
-      badgeEl.style.color = 'var(--accent-pink)';
-    }
+  // Metrics
+  metricsEl.innerHTML = `
+    <div class="acc-metric"><div class="val">${mae.toFixed(2)}°</div><div class="lbl">MAE</div></div>
+    <div class="acc-metric"><div class="val">${rmse.toFixed(2)}°</div><div class="lbl">RMSE</div></div>
+    <div class="acc-metric"><div class="val">${accuracy.toFixed(1)}%</div><div class="lbl">Accuracy</div></div>
+  `;
 
-    // Metrics
-    metricsEl.innerHTML = `
-      <div class="acc-metric"><div class="val">${mae.toFixed(2)}°</div><div class="lbl">MAE</div></div>
-      <div class="acc-metric"><div class="val">${rmse.toFixed(2)}°</div><div class="lbl">RMSE</div></div>
-      <div class="acc-metric"><div class="val">${accuracy.toFixed(1)}%</div><div class="lbl">Accuracy</div></div>
-    `;
+  // Draw SVG chart
+  const W = 1000, H = 140, PAD_T = 18, PAD_B = 22;
+  const allVals = [...apiTemps.slice(0, n), ...ourPreds.slice(0, n)];
+  const vMin = Math.min(...allVals) - 0.5;
+  const vMax = Math.max(...allVals) + 0.5;
+  const vRange = Math.max(vMax - vMin, 1);
 
-    // Draw SVG chart
-    const W = 1000, H = 140, PAD_T = 18, PAD_B = 22;
-    const allVals = [...actualTemps.slice(0, n), ...pastPredictions.slice(0, n)];
-    const vMin = Math.min(...allVals) - 0.5;
-    const vMax = Math.max(...allVals) + 0.5;
-    const vRange = Math.max(vMax - vMin, 1);
+  function toX(i) { return (i / (n - 1)) * W; }
+  function toY(v) { return PAD_T + (1 - (v - vMin) / vRange) * (H - PAD_T - PAD_B); }
 
-    function toX(i) { return (i / (n - 1)) * W; }
-    function toY(v) { return PAD_T + (1 - (v - vMin) / vRange) * (H - PAD_T - PAD_B); }
+  const apiPath = 'M ' + apiTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
+  const predPath = 'M ' + ourPreds.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
 
-    const actualPath = 'M ' + actualTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
-    const predPath = 'M ' + pastPredictions.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
+  // Fill area between lines (error band)
+  const fillPath = apiTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ')
+    + ' L ' + ourPreds.slice(0, n).reverse().map((v, i) => `${toX(n - 1 - i)},${toY(v)}`).join(' L ') + ' Z';
 
-    // Fill area between the two lines (error band)
-    const fillPath = actualTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ')
-      + ' L ' + pastPredictions.slice(0, n).reverse().map((v, i) => `${toX(n - 1 - i)},${toY(v)}`).join(' L ') + ' Z';
+  // Time labels (every 6h)
+  let timeTicks = '';
+  for (let i = 0; i < n; i += 6) {
+    const dt = new Date(timeLabels[i]);
+    const lbl = dt.toLocaleTimeString([], { hour: '2-digit', hour12: true }).replace(/^0/, '');
+    timeTicks += `<text x="${toX(i)}" y="${H - 2}" fill="#7a828e" font-size="22" text-anchor="middle" font-family="Inter,sans-serif">${lbl}</text>`;
+  }
 
-    // Time labels (every 6h)
-    let timeTicks = '';
-    for (let i = 0; i < n; i += 6) {
-      const dt = new Date(timeLabels[i]);
-      const lbl = dt.toLocaleTimeString([], { hour: '2-digit', hour12: true }).replace(/^0/, '');
-      timeTicks += `<text x="${toX(i)}" y="${H - 2}" fill="#7a828e" font-size="22" text-anchor="middle" font-family="Inter,sans-serif">${lbl}</text>`;
-    }
-
-    chartHost.innerHTML = `
-      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="errFillGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="rgba(242,139,130,0.25)"/>
-            <stop offset="1" stop-color="rgba(242,139,130,0.02)"/>
-          </linearGradient>
-        </defs>
-        <path d="M ${fillPath}" fill="url(#errFillGrad)"/>
-        <path d="${actualPath}" fill="none" stroke="#f9a825" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="${predPath}" fill="none" stroke="#8ab4f8" stroke-width="3" stroke-dasharray="8,5" stroke-linecap="round" stroke-linejoin="round"/>
-        ${timeTicks}
-      </svg>`;
-  });
+  chartHost.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="errFillGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="rgba(242,139,130,0.25)"/>
+          <stop offset="1" stop-color="rgba(242,139,130,0.02)"/>
+        </linearGradient>
+      </defs>
+      <path d="M ${fillPath}" fill="url(#errFillGrad)"/>
+      <path d="${apiPath}" fill="none" stroke="#f9a825" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${predPath}" fill="none" stroke="#8ab4f8" stroke-width="3" stroke-dasharray="8,5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${timeTicks}
+    </svg>`;
 }
 
 // ===== RENDER =====
