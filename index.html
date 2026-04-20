@@ -2540,7 +2540,7 @@ function buildWeeklySparkline(daily) {
   const min = Math.min(...lows);
   const max = Math.max(...highs);
   const range = Math.max(max - min, 1);
-  const w = 100 / limit;
+  const w = 1000 / limit;
   let bars = '';
   for (let i = 0; i < limit; i++) {
     const date = new Date(daily.time[i]);
@@ -2550,15 +2550,15 @@ function buildWeeklySparkline(daily) {
     const cx = i * w + w/2;
     bars += `
       <g class="spark-bar">
-        <line x1="${cx}" y1="${yHi}" x2="${cx}" y2="${yLo}" stroke="url(#sparkGrad)" stroke-width="${w * 0.4}" stroke-linecap="round"/>
-        <text class="spark-temp" x="${cx}" y="${yHi - 2}">${fmtTemp(highs[i])}°</text>
-        <text class="spark-label" x="${cx}" y="74">${dayName.slice(0,3)}</text>
+        <line x1="${cx}" y1="${yHi}" x2="${cx}" y2="${yLo}" stroke="url(#sparkGrad)" stroke-width="12" stroke-linecap="round"/>
+        <text class="spark-temp" x="${cx}" y="${yHi - 4}" fill="var(--text-primary)" font-size="20" font-weight="700" text-anchor="middle">${fmtTemp(highs[i])}°</text>
+        <text class="spark-label" x="${cx}" y="74" fill="var(--text-tertiary)" font-size="16" font-weight="600" text-anchor="middle">${dayName.slice(0,3)}</text>
       </g>`;
   }
   return `
     <div class="weekly-spark-wrap">
       <div class="weekly-spark-sub">Weekly trend</div>
-      <svg class="weekly-spark-svg" viewBox="0 0 100 80" preserveAspectRatio="none">
+      <svg class="weekly-spark-svg" viewBox="0 0 1000 80" preserveAspectRatio="none">
         <defs>
           <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#ffd166"/>

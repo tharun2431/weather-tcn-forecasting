@@ -75,37 +75,31 @@ async function runEdgeInference(hourlyData, currentHourIndex, hoursAhead = 12) {
     return null;
   }
   
-  // We need exactly 168 hours (7 days) of past data ending at currentHour
-  const startIndex = currentHourIndex - 167; 
-  if (startIndex < 0) {
-    console.error("Not enough past data to populate 168-hour sequence.");
-    return null;
-  }
-
-  // Build the 168x14 sequence
-  let seq = buildFeatures(hourlyData, startIndex, 168);
-  const targetIdx = 1; // "T (degC)"
-  
   const predictions = [];
   
-  // Autoregressive multi-step inference
+  // Predict using the rolling 168-hour window from the API data 
+  // (which includes the API's own future forecasts for other variables)
   for (let step = 0; step < hoursAhead; step++) {
+    // We want to predict for `currentHourIndex + 1 + step`
+    // So the sequence must end at `currentHourIndex + step`
+    const startIndex = currentHourIndex - 167 + step;
+    if (startIndex < 0 || startIndex + 168 > hourlyData.temperature_2m.length) {
+      console.warn("Not enough data to populate sequence for step", step);
+      break;
+    }
+    
+    // Build the 168x14 sequence using the actual/forecasted data from Open-Meteo
+    let seq = buildFeatures(hourlyData, startIndex, 168);
     const flatSeq = Float32Array.from(seq.flat());
     const tensor = new ort.Tensor('float32', flatSeq, [1, 168, 14]);
     
     const results = await session.run({ "input": tensor });
     const predScaled = results.temperature.data[0];
+    const targetIdx = 1; // "T (degC)"
     
     // Inverse transform
     const realTemp = (predScaled * scalerData.scale[targetIdx]) + scalerData.mean[targetIdx];
     predictions.push(realTemp);
-    
-    // Shift sequence window and inject prediction
-    const newRow = [...seq[seq.length - 1]]; // copy last row
-    newRow[targetIdx] = predScaled; // over-write temperature with prediction
-    
-    seq.shift(); // remove oldest
-    seq.push(newRow); // add newest
   }
   
   return predictions;
