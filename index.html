@@ -612,6 +612,70 @@ body.is-night .stars { opacity: 0.5; }
 /* Sunrise arc */
 .sun-arc { margin: 12px auto 4px; display: block; }
 
+/* ===== ACCURACY COMPARISON CARD ===== */
+.accuracy-card {
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: 22px;
+  padding: 18px 16px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(20px);
+}
+.accuracy-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.accuracy-header .acc-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+}
+.accuracy-header .acc-badge {
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+  background: rgba(129,201,149,0.15); color: var(--accent-green);
+}
+.accuracy-chart-wrap {
+  width: 100%; height: 140px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.accuracy-chart-wrap svg {
+  width: 100%; height: 100%;
+}
+.acc-legend {
+  display: flex; gap: 16px; justify-content: center;
+  margin-bottom: 12px;
+}
+.acc-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-secondary);
+}
+.acc-legend-dot {
+  width: 10px; height: 3px; border-radius: 2px;
+}
+.acc-metrics {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.acc-metric {
+  text-align: center;
+  padding: 10px 6px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.acc-metric .val {
+  font-size: 18px; font-weight: 700; color: var(--text-primary);
+}
+.acc-metric .lbl {
+  font-size: 10px; color: var(--text-tertiary); margin-top: 2px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.acc-footer {
+  text-align: center; margin-top: 10px;
+  font-size: 10px; color: var(--text-tertiary);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+
 /* ===== BOTTOM NAV (Premium glass pill) ===== */
 .bottom-nav {
   position: fixed; bottom: calc(14px + var(--safe-bottom));
@@ -1419,6 +1483,27 @@ body.is-night .meteors { opacity: 1; }
       </div>
       <div class="hourly-chart-card" id="hourlyChartHost"></div>
       <div class="hourly-scroll" id="hourlyScroll"></div>
+    </div>
+
+    <!-- AI Accuracy: Prediction vs Actual -->
+    <div class="accuracy-card reveal" id="accuracyCard" style="display:none;">
+      <div class="accuracy-header">
+        <div class="acc-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          AI Accuracy — Prediction vs Reality
+        </div>
+        <div class="acc-badge" id="accBadge">--</div>
+      </div>
+      <div class="accuracy-chart-wrap" id="accChartHost"></div>
+      <div class="acc-legend">
+        <div class="acc-legend-item"><div class="acc-legend-dot" style="background:#8ab4f8;"></div>Our AI Prediction</div>
+        <div class="acc-legend-item"><div class="acc-legend-dot" style="background:#f9a825;"></div>Actual (Open-Meteo)</div>
+      </div>
+      <div class="acc-metrics" id="accMetrics"></div>
+      <div class="acc-footer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        Verified against Open-Meteo ground truth · Past 24h
+      </div>
     </div>
 
     <!-- 10-Day -->
@@ -2660,6 +2745,121 @@ async function fetchWeather(city) {
   }
 }
 
+// ===== PREDICTION VS ACTUAL COMPARISON =====
+function renderAccuracyComparison(hourlyData, currentHourIndex, futurePredictions) {
+  const card = document.getElementById('accuracyCard');
+  const chartHost = document.getElementById('accChartHost');
+  const metricsEl = document.getElementById('accMetrics');
+  const badgeEl = document.getElementById('accBadge');
+  if (!card || !chartHost || !session) return;
+
+  // We compare using PAST 24 hours: run model on data from 24h ago and compare to actuals
+  const pastEndIndex = currentHourIndex; // now
+  const pastStartIndex = pastEndIndex - 24;  // 24h ago
+  const seqStart = pastStartIndex - 168; // need 168h window before
+
+  if (seqStart < 0 || pastStartIndex < 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  // Get actual temperatures from the past 24h (from the API)
+  const actualTemps = [];
+  const timeLabels = [];
+  for (let i = 0; i < 24; i++) {
+    const idx = pastStartIndex + i;
+    if (idx >= hourlyData.temperature_2m.length) break;
+    actualTemps.push(hourlyData.temperature_2m[idx]);
+    timeLabels.push(hourlyData.time[idx]);
+  }
+  if (actualTemps.length < 12) { card.style.display = 'none'; return; }
+
+  // Run the ONNX model on data from 24h ago to predict what "would have" happened
+  runEdgeInference(hourlyData, pastStartIndex, actualTemps.length).then(pastPredictions => {
+    if (!pastPredictions || pastPredictions.length < 12) {
+      card.style.display = 'none';
+      return;
+    }
+
+    const n = Math.min(actualTemps.length, pastPredictions.length);
+
+    // Calculate metrics
+    let sumAbsErr = 0, sumSqErr = 0, maxErr = 0;
+    for (let i = 0; i < n; i++) {
+      const err = Math.abs(pastPredictions[i] - actualTemps[i]);
+      sumAbsErr += err;
+      sumSqErr += err * err;
+      if (err > maxErr) maxErr = err;
+    }
+    const mae = sumAbsErr / n;
+    const rmse = Math.sqrt(sumSqErr / n);
+    const tempRange = Math.max(...actualTemps) - Math.min(...actualTemps);
+    const accuracy = Math.max(0, Math.min(100, 100 - (mae / Math.max(tempRange, 1) * 100)));
+
+    // Show card
+    card.style.display = 'block';
+
+    // Badge
+    badgeEl.textContent = accuracy.toFixed(1) + '%';
+    if (accuracy >= 90) {
+      badgeEl.style.background = 'rgba(129,201,149,0.15)';
+      badgeEl.style.color = 'var(--accent-green)';
+    } else if (accuracy >= 75) {
+      badgeEl.style.background = 'rgba(249,168,37,0.15)';
+      badgeEl.style.color = 'var(--accent-orange)';
+    } else {
+      badgeEl.style.background = 'rgba(242,139,130,0.15)';
+      badgeEl.style.color = 'var(--accent-pink)';
+    }
+
+    // Metrics
+    metricsEl.innerHTML = `
+      <div class="acc-metric"><div class="val">${mae.toFixed(2)}°</div><div class="lbl">MAE</div></div>
+      <div class="acc-metric"><div class="val">${rmse.toFixed(2)}°</div><div class="lbl">RMSE</div></div>
+      <div class="acc-metric"><div class="val">${accuracy.toFixed(1)}%</div><div class="lbl">Accuracy</div></div>
+    `;
+
+    // Draw SVG chart
+    const W = 1000, H = 140, PAD_T = 18, PAD_B = 22;
+    const allVals = [...actualTemps.slice(0, n), ...pastPredictions.slice(0, n)];
+    const vMin = Math.min(...allVals) - 0.5;
+    const vMax = Math.max(...allVals) + 0.5;
+    const vRange = Math.max(vMax - vMin, 1);
+
+    function toX(i) { return (i / (n - 1)) * W; }
+    function toY(v) { return PAD_T + (1 - (v - vMin) / vRange) * (H - PAD_T - PAD_B); }
+
+    const actualPath = 'M ' + actualTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
+    const predPath = 'M ' + pastPredictions.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ');
+
+    // Fill area between the two lines (error band)
+    const fillPath = actualTemps.slice(0, n).map((v, i) => `${toX(i)},${toY(v)}`).join(' L ')
+      + ' L ' + pastPredictions.slice(0, n).reverse().map((v, i) => `${toX(n - 1 - i)},${toY(v)}`).join(' L ') + ' Z';
+
+    // Time labels (every 6h)
+    let timeTicks = '';
+    for (let i = 0; i < n; i += 6) {
+      const dt = new Date(timeLabels[i]);
+      const lbl = dt.toLocaleTimeString([], { hour: '2-digit', hour12: true }).replace(/^0/, '');
+      timeTicks += `<text x="${toX(i)}" y="${H - 2}" fill="#7a828e" font-size="22" text-anchor="middle" font-family="Inter,sans-serif">${lbl}</text>`;
+    }
+
+    chartHost.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="errFillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="rgba(242,139,130,0.25)"/>
+            <stop offset="1" stop-color="rgba(242,139,130,0.02)"/>
+          </linearGradient>
+        </defs>
+        <path d="M ${fillPath}" fill="url(#errFillGrad)"/>
+        <path d="${actualPath}" fill="none" stroke="#f9a825" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${predPath}" fill="none" stroke="#8ab4f8" stroke-width="3" stroke-dasharray="8,5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${timeTicks}
+      </svg>`;
+  });
+}
+
 // ===== RENDER =====
 function renderWeather(data, city) {
   const c = data.current;
@@ -2748,6 +2948,9 @@ function renderWeather(data, city) {
       }
       document.getElementById('hourlyScroll').innerHTML = hourlyHtml;
       renderHourlyChart(temps, timeLabels);
+
+      // === PREDICTION VS ACTUAL COMPARISON ===
+      renderAccuracyComparison(h, currentHourIndex, predictions);
     } else {
       document.getElementById('predText').innerHTML = generateSmartNarrative(c, d, null);
     }

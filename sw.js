@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v27-bugfix';
+const CACHE_NAME = 'deepweather-v28-accuracy';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
