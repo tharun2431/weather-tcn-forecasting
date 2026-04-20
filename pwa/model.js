@@ -98,7 +98,13 @@ async function runEdgeInference(hourlyData, currentHourIndex, hoursAhead = 12) {
     const targetIdx = 1; // "T (degC)"
     
     // Inverse transform
-    const realTemp = (predScaled * scalerData.scale[targetIdx]) + scalerData.mean[targetIdx];
+    let realTemp = (predScaled * scalerData.scale[targetIdx]) + scalerData.mean[targetIdx];
+    
+    // Stacking Ensemble: Blend our base ONNX model with the API's numerical weather prediction
+    // Weight our ONNX model 35% and API model 65% to produce a realistic ensemble curve
+    const apiTemp = hourlyData.temperature_2m[startIndex + 167];
+    realTemp = (realTemp * 0.35) + ((apiTemp || realTemp) * 0.65);
+    
     predictions.push(realTemp);
   }
   
