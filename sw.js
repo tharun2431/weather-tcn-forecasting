@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v33-sparkline';
+const CACHE_NAME = 'deepweather-v34-presentation';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
