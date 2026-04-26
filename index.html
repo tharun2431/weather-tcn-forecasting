@@ -1801,9 +1801,199 @@ body[data-mode="neural"] .standard-only { display: none !important; }
 }
 .version-badge .dot { color: rgba(192,132,252,0.5); margin: 0 4px; }
 .version-badge:hover { color: rgba(255,255,255,0.5); }
+
+/* ===== LIVE TIMESTAMP TICKER ===== */
+.live-clock {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: rgba(14,16,20,0.65);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(129,201,149,0.25);
+  color: var(--accent-green);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.4px;
+  z-index: 100;
+  font-family: 'JetBrains Mono', 'Inter', monospace;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 0.5s, transform 0.5s, border-color 0.5s, color 0.5s;
+}
+.live-clock.show { opacity: 1; transform: translateY(0); }
+.live-clock.stale { color: var(--accent-orange); border-color: rgba(249,168,37,0.3); }
+.live-clock.stale .lc-dot { background: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); }
+.lc-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+  animation: pulseDot 2s ease-out infinite;
+}
+
+/* ===== COMPARE CITIES SCREEN ===== */
+.compare-entry {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(192,132,252,0.12);
+  border: 1px solid rgba(192,132,252,0.25);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+  transition: transform 0.2s, background 0.2s;
+}
+.compare-entry:hover { background: rgba(192,132,252,0.22); transform: scale(1.05); }
+.compare-entry svg { width: 18px; height: 18px; color: #c084fc; }
+
+.section-sub {
+  color: var(--text-secondary); font-size: 13px;
+  margin-bottom: 16px; line-height: 1.5;
+}
+
+.compare-grid {
+  display: flex; flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.compare-vs {
+  align-self: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 800;
+  color: #c084fc;
+  letter-spacing: 2px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: rgba(192,132,252,0.12);
+  border: 1px solid rgba(192,132,252,0.25);
+}
+.compare-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--card-border);
+  border-radius: 22px;
+  padding: 16px;
+  position: relative; overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.compare-card.side-a { border-color: rgba(138,180,248,0.18); }
+.compare-card.side-b { border-color: rgba(192,132,252,0.18); }
+.compare-card.side-a::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 0% 0%, rgba(138,180,248,0.10), transparent 60%);
+  pointer-events: none;
+}
+.compare-card.side-b::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 100% 0%, rgba(192,132,252,0.10), transparent 60%);
+  pointer-events: none;
+}
+.compare-card > * { position: relative; z-index: 1; }
+.cmp-picker {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff; font-size: 14px; font-weight: 600;
+  font-family: var(--font);
+  margin-bottom: 14px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23b8bcc4' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 10px 6px;
+  padding-right: 32px;
+}
+.cmp-picker option { background: #0f1319; color: #fff; }
+.cmp-row-top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px;
+}
+.cmp-icon {
+  font-size: 38px; line-height: 1;
+}
+.cmp-temp {
+  font-size: 44px; font-weight: 200;
+  line-height: 1; color: #fff;
+  letter-spacing: -1.5px;
+}
+.cmp-temp .deg { font-size: 24px; font-weight: 300; opacity: 0.7; vertical-align: top; }
+.cmp-desc {
+  margin-top: 4px;
+  font-size: 12px; color: var(--text-secondary);
+  text-align: right;
+}
+.cmp-stat-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-top: 14px;
+}
+.cmp-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+.cmp-stat .lbl {
+  display: block;
+  font-size: 9px; font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.cmp-stat .val {
+  font-size: 18px; font-weight: 700; color: #fff;
+  font-family: 'JetBrains Mono', 'Inter', monospace;
+  letter-spacing: -0.3px;
+}
+.cmp-stat.stat-pred .val { color: #8ab4f8; }
+.cmp-stat.stat-acc .val { color: var(--accent-green); }
+.cmp-stat.stat-acc.medium .val { color: var(--accent-orange); }
+.cmp-stat.stat-acc.low .val { color: var(--accent-pink); }
+.compare-summary {
+  background: linear-gradient(135deg, rgba(138,180,248,0.06), rgba(192,132,252,0.06));
+  border: 1px solid rgba(192,132,252,0.18);
+  border-radius: 18px;
+  padding: 14px 16px;
+  font-size: 13px; line-height: 1.55;
+  color: var(--text-secondary);
+}
+.compare-summary strong { color: #fff; font-weight: 700; }
+.compare-summary .winner { color: var(--accent-green); }
+.compare-summary .runner-up { color: var(--accent-orange); }
+.compare-skeleton {
+  height: 220px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 22px;
+}
+@keyframes shimmer {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
+@media (min-width: 600px) {
+  .compare-grid {
+    flex-direction: row; align-items: stretch;
+  }
+  .compare-card { flex: 1; }
+  .compare-vs { align-self: center; }
+}
 </style>
 </head>
 <body>
+
+<!-- Live data ticker -->
+<div class="live-clock" id="liveClock">
+  <span class="lc-dot"></span>
+  <span class="lc-text">Live · just now</span>
+</div>
 
 <!-- Animated splash -->
 <div class="splash" id="splash">
@@ -1875,6 +2065,9 @@ body[data-mode="neural"] .standard-only { display: none !important; }
 
     <div class="header">
       <div class="location" onclick="showScreen('searchScreen')"><span id="cityName">Jena</span></div>
+      <div class="compare-entry" onclick="showScreen('compareScreen')" title="Compare cities">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      </div>
     </div>
 
     <!-- Mode toggle: Standard | Neural -->
@@ -2196,6 +2389,62 @@ body[data-mode="neural"] .standard-only { display: none !important; }
     </div>
   </div>
 
+  <!-- ===== COMPARE CITIES SCREEN ===== -->
+  <div id="compareScreen" class="screen">
+    <h2 class="section-title">⚖️ Compare Cities</h2>
+    <p class="section-sub">Run live ONNX inference for two regions side by side and see how AI accuracy varies.</p>
+
+    <div class="compare-grid">
+      <div class="compare-card side-a" id="compareCardA">
+        <select class="cmp-picker" id="compareSelectA" onchange="loadCompareSide('A', this.value)"></select>
+        <div class="cmp-row-top">
+          <div class="cmp-icon" id="cmpIconA">🌤️</div>
+          <div>
+            <div class="cmp-temp" id="cmpTempA">--<span class="deg">°</span></div>
+            <div class="cmp-desc" id="cmpDescA">Loading...</div>
+          </div>
+        </div>
+        <div class="cmp-stat-row">
+          <div class="cmp-stat stat-pred">
+            <span class="lbl">AI Predict (1h)</span>
+            <span class="val" id="cmpPredA">--°</span>
+          </div>
+          <div class="cmp-stat stat-acc" id="cmpAccBoxA">
+            <span class="lbl">Accuracy</span>
+            <span class="val" id="cmpAccA">--%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-vs">VS</div>
+
+      <div class="compare-card side-b" id="compareCardB">
+        <select class="cmp-picker" id="compareSelectB" onchange="loadCompareSide('B', this.value)"></select>
+        <div class="cmp-row-top">
+          <div class="cmp-icon" id="cmpIconB">🌤️</div>
+          <div>
+            <div class="cmp-temp" id="cmpTempB">--<span class="deg">°</span></div>
+            <div class="cmp-desc" id="cmpDescB">Loading...</div>
+          </div>
+        </div>
+        <div class="cmp-stat-row">
+          <div class="cmp-stat stat-pred">
+            <span class="lbl">AI Predict (1h)</span>
+            <span class="val" id="cmpPredB">--°</span>
+          </div>
+          <div class="cmp-stat stat-acc" id="cmpAccBoxB">
+            <span class="lbl">Accuracy</span>
+            <span class="val" id="cmpAccB">--%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="compare-summary" id="compareSummary">
+      <strong>Pick two cities</strong> to see how the model's accuracy shifts across climates. Larger temperature swings (continental) tend to widen the AI vs NWP gap; coastal cities are usually steadier.
+    </div>
+  </div>
+
 </div>
 
 <!-- ===== BOTTOM NAVIGATION ===== -->
@@ -2216,9 +2465,9 @@ body[data-mode="neural"] .standard-only { display: none !important; }
     <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
     <span>Settings</span>
   </div>
-  <div class="nav-item" onclick="showScreen('aboutScreen')" id="navAbout">
-    <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
-    <span>About</span>
+  <div class="nav-item" onclick="showScreen('compareScreen')" id="navCompare">
+    <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
+    <span>Compare</span>
   </div>
 </div>
 
@@ -3264,6 +3513,7 @@ async function fetchWeather(city) {
     const res = await fetch(url);
     const data = await res.json();
     renderWeather(data, city);
+    markFetchTime();
   } catch (e) {
     console.error('Weather fetch failed:', e);
     showToast('Failed to fetch weather — check connection', 'error');
@@ -3764,9 +4014,10 @@ function showScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navMap = { weatherScreen: 'navWeather', modelsScreen: 'navModels', searchScreen: 'navSearch', settingsScreen: 'navSettings', aboutScreen: 'navAbout' };
-  if (navMap[screenId]) document.getElementById(navMap[screenId]).classList.add('active');
+  const navMap = { weatherScreen: 'navWeather', modelsScreen: 'navModels', searchScreen: 'navSearch', settingsScreen: 'navSettings', aboutScreen: 'navAbout', compareScreen: 'navCompare' };
+  if (navMap[screenId]) document.getElementById(navMap[screenId])?.classList.add('active');
   if (screenId === 'settingsScreen') renderSettings();
+  if (screenId === 'compareScreen') initCompareScreen();
 
   if (screenId === 'searchScreen') {
     setTimeout(() => document.getElementById('searchInput').focus(), 100);
@@ -3856,6 +4107,141 @@ setTimeout(() => {
     fetchWeather(DEFAULT_CITY);
   }
 })();
+
+// ===== LIVE TIMESTAMP TICKER =====
+let _lastFetchTimestamp = null;
+let _liveClockTimer = null;
+function markFetchTime() {
+  _lastFetchTimestamp = Date.now();
+  const el = document.getElementById('liveClock');
+  if (el) el.classList.add('show');
+  if (_liveClockTimer) clearInterval(_liveClockTimer);
+  updateLiveClock();
+  _liveClockTimer = setInterval(updateLiveClock, 1000);
+}
+function updateLiveClock() {
+  const el = document.getElementById('liveClock');
+  if (!el || !_lastFetchTimestamp) return;
+  const seconds = Math.floor((Date.now() - _lastFetchTimestamp) / 1000);
+  let text;
+  if (seconds < 5)        text = 'Live · just now';
+  else if (seconds < 60)  text = `Live · ${seconds}s ago`;
+  else if (seconds < 3600) text = `Live · ${Math.floor(seconds / 60)}m ago`;
+  else                    text = `Live · ${Math.floor(seconds / 3600)}h ago`;
+  el.querySelector('.lc-text').textContent = text;
+  // Mark stale after 10 minutes
+  el.classList.toggle('stale', seconds > 600);
+}
+
+// ===== COMPARE CITIES =====
+let _compareData = { A: null, B: null };
+
+function initCompareScreen() {
+  // Default cities for A & B
+  const defaultA = currentCity?.name || 'Jena';
+  const defaultB = defaultA === 'Berlin' ? 'Tokyo' : 'Berlin';
+  ['A', 'B'].forEach(side => {
+    const sel = document.getElementById('compareSelect' + side);
+    if (!sel) return;
+    if (sel.options.length === 0) {
+      sel.innerHTML = CITIES.map(c => `<option value="${c.name}">${c.name}, ${c.country}</option>`).join('');
+    }
+    const def = side === 'A' ? defaultA : defaultB;
+    if ([...sel.options].some(o => o.value === def)) sel.value = def;
+  });
+  // Auto-load both sides
+  loadCompareSide('A', document.getElementById('compareSelectA').value);
+  loadCompareSide('B', document.getElementById('compareSelectB').value);
+}
+
+async function loadCompareSide(side, cityName) {
+  const city = CITIES.find(c => c.name === cityName);
+  if (!city) return;
+  // Set loading state
+  document.getElementById('cmpTempV' + side); // no-op
+  document.getElementById('cmpTemp' + side).innerHTML = '--<span class="deg">°</span>';
+  document.getElementById('cmpDesc' + side).textContent = 'Loading…';
+  document.getElementById('cmpPred' + side).textContent = '--°';
+  document.getElementById('cmpAcc' + side).textContent = '--%';
+  document.getElementById('cmpIcon' + side).textContent = '⏳';
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,weather_code,relative_humidity_2m&hourly=temperature_2m,weather_code&timezone=auto&forecast_days=2`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
+    const h = data.hourly;
+    const info = getWeatherInfo(c.weather_code);
+    const idx = h.time.indexOf(h.time.find(t => new Date(t).getTime() >= new Date().setMinutes(0,0,0)));
+    // Run our ONNX inference (6 hours ahead is enough for compare)
+    let preds = null;
+    try { preds = await runEdgeInference(h, idx, 6); } catch (e) { preds = null; }
+    // Compute accuracy: AI prediction vs Open-Meteo NWP forecast for next 6 hours
+    let mae = 0, accuracy = 0;
+    if (preds && preds.length) {
+      let sumErr = 0, cnt = 0;
+      const apiVals = [];
+      for (let i = 0; i < preds.length && i < 6; i++) {
+        const apiV = h.temperature_2m[idx + i + 1];
+        if (apiV == null || preds[i] == null) continue;
+        sumErr += Math.abs(preds[i] - apiV);
+        apiVals.push(apiV);
+        cnt++;
+      }
+      if (cnt > 0 && apiVals.length) {
+        mae = sumErr / cnt;
+        const range = Math.max(...apiVals) - Math.min(...apiVals);
+        accuracy = Math.max(0, Math.min(100, 100 - (mae / Math.max(range, 1) * 100)));
+      }
+    }
+    const predNext = preds && preds[0] != null ? preds[0] : null;
+
+    // Populate
+    document.getElementById('cmpIcon' + side).textContent = info.icon;
+    document.getElementById('cmpTemp' + side).innerHTML = `${fmtTemp(c.temperature_2m)}<span class="deg">°</span>`;
+    document.getElementById('cmpDesc' + side).innerHTML = `<strong style="color:#fff;">${info.desc}</strong><br>${city.name}, ${city.country}<br><span style="font-size:11px; color:var(--text-tertiary);">Humidity ${c.relative_humidity_2m}%</span>`;
+    document.getElementById('cmpPred' + side).textContent = predNext != null ? `${fmtTemp(predNext)}°` : 'n/a';
+    document.getElementById('cmpAcc' + side).textContent = preds ? `${accuracy.toFixed(1)}%` : 'n/a';
+    // Color the accuracy box based on tier
+    const accBox = document.getElementById('cmpAccBox' + side);
+    accBox.classList.remove('medium', 'low');
+    if (accuracy < 70) accBox.classList.add('low');
+    else if (accuracy < 85) accBox.classList.add('medium');
+
+    _compareData[side] = { city, current: c, accuracy, mae, predNext, info };
+    buildCompareSummary();
+  } catch (e) {
+    console.error('Compare fetch failed', e);
+    document.getElementById('cmpDesc' + side).textContent = 'Fetch failed';
+    document.getElementById('cmpIcon' + side).textContent = '⚠️';
+  }
+}
+
+function buildCompareSummary() {
+  const A = _compareData.A;
+  const B = _compareData.B;
+  const sumEl = document.getElementById('compareSummary');
+  if (!sumEl) return;
+  if (!A || !B) return;
+  const tempDiff = A.current.temperature_2m - B.current.temperature_2m;
+  const accDiff = A.accuracy - B.accuracy;
+  const winner = accDiff > 0 ? A : B;
+  const runnerUp = accDiff > 0 ? B : A;
+  const absAccDiff = Math.abs(accDiff).toFixed(1);
+  let temperatureLine, accuracyLine;
+  if (Math.abs(tempDiff) < 1.5) {
+    temperatureLine = `Both regions sit at <strong>${fmtTemp(A.current.temperature_2m)}°</strong> ≈ <strong>${fmtTemp(B.current.temperature_2m)}°</strong> right now.`;
+  } else {
+    const warmer = tempDiff > 0 ? A : B;
+    const cooler = tempDiff > 0 ? B : A;
+    temperatureLine = `<strong>${warmer.city.name}</strong> is <strong style="color:var(--accent-orange);">${Math.abs(tempDiff).toFixed(1)}°</strong> warmer than <strong>${cooler.city.name}</strong>.`;
+  }
+  if (absAccDiff < 1) {
+    accuracyLine = `AI accuracy is essentially tied — <strong>${A.accuracy.toFixed(1)}%</strong> vs <strong>${B.accuracy.toFixed(1)}%</strong>.`;
+  } else {
+    accuracyLine = `Our model performs <strong class="winner">${absAccDiff}% better</strong> in <strong>${winner.city.name}</strong> (${winner.accuracy.toFixed(1)}%) than in <strong class="runner-up">${runnerUp.city.name}</strong> (${runnerUp.accuracy.toFixed(1)}%).`;
+  }
+  sumEl.innerHTML = `${temperatureLine}<br>${accuracyLine}<br><span style="font-size:11px; color:var(--text-tertiary);">Lower MAE = better. Reading the gap helps tell whether the model generalises across climates.</span>`;
+}
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
