@@ -505,6 +505,152 @@ body.is-night .stars { opacity: 0.5; }
   border-color: rgba(255,255,255,0.14);
 }
 
+/* ===== ANIMATED CARD BACKGROUNDS ===== */
+.m-card > .m-bg {
+  position: absolute; inset: 0;
+  z-index: 0; pointer-events: none;
+  overflow: hidden; border-radius: inherit;
+  opacity: 0.85;
+}
+.m-card:hover > .m-bg { opacity: 1; }
+.m-bg svg { width: 100%; height: 100%; display: block; }
+
+/* — FEELS LIKE: heat shimmer waves — */
+.m-bg-feels::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 110%, rgba(249,168,37,0.18), transparent 60%);
+}
+.heat-wave { animation: heatShimmer 7s ease-in-out infinite; transform-origin: center; }
+.heat-wave-2 { animation-delay: -2.3s; }
+.heat-wave-3 { animation-delay: -4.6s; }
+@keyframes heatShimmer {
+  0%, 100% { transform: translateX(-12px); opacity: 0.5; }
+  50%      { transform: translateX(12px); opacity: 1; }
+}
+.m-bg-feels-cool::before {
+  background: radial-gradient(ellipse at 50% 110%, rgba(138,180,248,0.18), transparent 60%);
+}
+
+/* — WIND: drifting streamlines — */
+.wind-stream {
+  stroke-dasharray: 60 14;
+  animation: windDrift 5s linear infinite;
+}
+.wind-stream-2 { animation-delay: -1.6s; animation-duration: 6s; }
+.wind-stream-3 { animation-delay: -3.2s; animation-duration: 7s; }
+@keyframes windDrift {
+  0%   { stroke-dashoffset: 200; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { stroke-dashoffset: -200; opacity: 0; }
+}
+
+/* — PRECIPITATION: falling raindrops — */
+.raindrop {
+  position: absolute; top: -14px;
+  width: 1.5px; height: 14px;
+  background: linear-gradient(to bottom, transparent, rgba(138,180,248,0.7));
+  border-radius: 0 0 2px 2px;
+  animation: rainFall 1.6s linear infinite;
+}
+@keyframes rainFall {
+  0%   { transform: translateY(-30px); opacity: 0; }
+  15%  { opacity: 1; }
+  90%  { opacity: 0.8; }
+  100% { transform: translateY(260px); opacity: 0; }
+}
+.m-bg-precip::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0;
+  height: 60%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,180,248,0.18), transparent 70%);
+}
+
+/* — UV INDEX: rotating sun rays + pulsing core — */
+.uv-rays-group {
+  transform-origin: center;
+  animation: uvSpin 50s linear infinite;
+}
+@keyframes uvSpin { to { transform: rotate(360deg); } }
+.uv-glow {
+  animation: uvPulse 3.5s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes uvPulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.95); }
+  50%      { opacity: 0.7; transform: scale(1.05); }
+}
+
+/* — HUMIDITY: rising bubbles — */
+.h-bubble {
+  position: absolute; bottom: -10px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(138,180,248,0.45);
+  box-shadow: 0 0 8px rgba(138,180,248,0.4);
+  animation: bubbleRise 6s ease-in infinite;
+}
+.h-bubble.sm { width: 3px; height: 3px; }
+.h-bubble.lg { width: 7px; height: 7px; }
+@keyframes bubbleRise {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.7; }
+  100% { transform: translate(10px, -220px); opacity: 0; }
+}
+
+/* — SUNRISE / SUNSET: animated horizon glow — */
+.m-bg-sun::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 50%;
+  background: linear-gradient(to top, rgba(249,168,37,0.15), transparent);
+  animation: sunPulse 4s ease-in-out infinite;
+}
+@keyframes sunPulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+/* — MOON: twinkling stars — */
+.m-star {
+  position: absolute;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255,255,255,0.9), 0 0 8px rgba(255,255,255,0.4);
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.m-star.lg { width: 3px; height: 3px; box-shadow: 0 0 6px #fff, 0 0 14px rgba(138,180,248,0.5); }
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50%      { opacity: 1; transform: scale(1.2); }
+}
+
+/* — PRESSURE: subtle radial pulse — */
+.m-bg-pressure::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(192,132,252,0.10), transparent 60%);
+  animation: pressurePulse 4s ease-in-out infinite;
+}
+@keyframes pressurePulse {
+  0%, 100% { transform: scale(0.9); opacity: 0.6; }
+  50%      { transform: scale(1.1); opacity: 1; }
+}
+
+/* — AIR QUALITY: floating particles — */
+.aq-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  animation: particleFloat 7s ease-in-out infinite;
+}
+@keyframes particleFloat {
+  0%   { transform: translate(0, 20px); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translate(20px, -180px); opacity: 0; }
+}
+
 /* Staggered entrance */
 @keyframes cardFloat {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
@@ -3243,24 +3389,65 @@ function renderWeather(data, city) {
     </div>
 
     <div class="m-card" data-detail="feels">
+      <div class="m-bg ${feelsLike >= c.temperature_2m ? 'm-bg-feels' : 'm-bg-feels-cool'}">
+        <svg viewBox="0 0 200 200" preserveAspectRatio="none">
+          <path class="heat-wave" d="M-30 60 Q 30 50 70 60 T 230 58" stroke="${feelsLike >= c.temperature_2m ? 'rgba(249,168,37,0.22)' : 'rgba(138,180,248,0.22)'}" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path class="heat-wave heat-wave-2" d="M-30 100 Q 40 90 90 100 T 230 98" stroke="${feelsLike >= c.temperature_2m ? 'rgba(242,139,130,0.18)' : 'rgba(173,216,230,0.18)'}" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path class="heat-wave heat-wave-3" d="M-30 140 Q 30 130 80 140 T 230 138" stroke="${feelsLike >= c.temperature_2m ? 'rgba(249,168,37,0.14)' : 'rgba(138,180,248,0.14)'}" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg> Feels like</div>
       <div class="m-val">${fmtTemp(c.apparent_temperature)}°</div>
       <div class="m-desc">${feelsLike > c.temperature_2m ? 'Warmer than actual' : feelsLike < c.temperature_2m ? 'Cooler than actual' : 'Similar to actual'}</div>
     </div>
 
     <div class="m-card" data-detail="wind" style="min-height:200px;">
+      <div class="m-bg">
+        <svg viewBox="0 0 200 200" preserveAspectRatio="none">
+          <path class="wind-stream" d="M-30 50 Q 50 38 100 50 T 230 46" stroke="rgba(138,180,248,0.32)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <path class="wind-stream wind-stream-2" d="M-30 100 Q 60 90 120 100 T 230 96" stroke="rgba(138,180,248,0.22)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <path class="wind-stream wind-stream-3" d="M-30 150 Q 50 142 110 150 T 230 146" stroke="rgba(192,132,252,0.22)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
       <div class="m-label"><svg class="wind-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg> Wind</div>
       ${buildCompass(fmtWind(c.wind_speed_10m), windDir)}
       <div class="m-desc" style="margin-top:4px;"><strong style="color:#fff;">${fmtWind(c.wind_speed_10m)}</strong> ${windUnit()} · ${beaufort}</div>
     </div>
 
     <div class="m-card" data-detail="precip">
+      <div class="m-bg m-bg-precip">
+        <div class="raindrop" style="left:12%; animation-delay:0s;"></div>
+        <div class="raindrop" style="left:24%; animation-delay:0.4s;"></div>
+        <div class="raindrop" style="left:38%; animation-delay:0.9s;"></div>
+        <div class="raindrop" style="left:52%; animation-delay:0.2s;"></div>
+        <div class="raindrop" style="left:65%; animation-delay:1.1s;"></div>
+        <div class="raindrop" style="left:78%; animation-delay:0.6s;"></div>
+        <div class="raindrop" style="left:90%; animation-delay:1.3s;"></div>
+        <div class="raindrop" style="left:18%; animation-delay:1.5s;"></div>
+        <div class="raindrop" style="left:46%; animation-delay:1.8s;"></div>
+        <div class="raindrop" style="left:72%; animation-delay:0.75s;"></div>
+      </div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 19v2M8 13v2M16 19v2M16 13v2M12 21v2M12 15v2M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg> Precipitation</div>
       <div class="m-val">${precipToday}<span class="m-unit">%</span></div>
       <div class="m-desc">Chance of rain today</div>
     </div>
 
     <div class="m-card m-circle" data-detail="uv">
+      <div class="m-bg">
+        <svg viewBox="0 0 200 200">
+          <circle class="uv-glow" cx="100" cy="100" r="34" fill="${uvClr}" opacity="0.35"/>
+          <g class="uv-rays-group" style="transform-origin: 100px 100px;">
+            <line x1="100" y1="22" x2="100" y2="48" stroke="${uvClr}" stroke-width="2.4" stroke-linecap="round" opacity="0.5"/>
+            <line x1="100" y1="152" x2="100" y2="178" stroke="${uvClr}" stroke-width="2.4" stroke-linecap="round" opacity="0.5"/>
+            <line x1="22" y1="100" x2="48" y2="100" stroke="${uvClr}" stroke-width="2.4" stroke-linecap="round" opacity="0.5"/>
+            <line x1="152" y1="100" x2="178" y2="100" stroke="${uvClr}" stroke-width="2.4" stroke-linecap="round" opacity="0.5"/>
+            <line x1="44" y1="44" x2="62" y2="62" stroke="${uvClr}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="156" y1="44" x2="138" y2="62" stroke="${uvClr}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="44" y1="156" x2="62" y2="138" stroke="${uvClr}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="156" y1="156" x2="138" y2="138" stroke="${uvClr}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+          </g>
+        </svg>
+      </div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg> UV index</div>
       <div class="m-val uv-val" style="color:${uvClr}">${uvIndex}</div>
       <div class="m-desc" style="padding-top:2px;color:${uvClr};opacity:0.9;font-weight:600;">${uvLabel}</div>
@@ -3268,6 +3455,7 @@ function renderWeather(data, city) {
     </div>
 
     <div class="m-card" style="min-height:150px;" data-detail="sun">
+      <div class="m-bg m-bg-sun"></div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Sunrise · Sunset</div>
       <svg class="sun-arc" width="100%" height="56" viewBox="0 0 120 56" preserveAspectRatio="none" style="width:100%;">
         <defs>
@@ -3289,24 +3477,51 @@ function renderWeather(data, city) {
     </div>
 
     <div class="m-card" data-detail="humidity">
+      <div class="m-bg">
+        <div class="h-bubble" style="left:15%; animation-delay:0s;"></div>
+        <div class="h-bubble sm" style="left:32%; animation-delay:1.4s;"></div>
+        <div class="h-bubble lg" style="left:50%; animation-delay:0.7s;"></div>
+        <div class="h-bubble" style="left:68%; animation-delay:2.2s;"></div>
+        <div class="h-bubble sm" style="left:82%; animation-delay:1s;"></div>
+        <div class="h-bubble" style="left:25%; animation-delay:3s;"></div>
+        <div class="h-bubble sm" style="left:60%; animation-delay:3.6s;"></div>
+      </div>
       <div class="m-label"><svg class="drop-shimmer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg> Humidity</div>
       <div class="m-val">${humidity}<span class="m-unit">%</span></div>
       <div class="m-desc">Dew point ${fmtTemp(c.temperature_2m - ((100 - humidity) / 5))}°</div>
     </div>
 
     <div class="m-card m-circle" data-detail="pressure">
+      <div class="m-bg m-bg-pressure"></div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> Pressure</div>
       <div class="m-val" style="font-size:${getSetting('pressure')==='inhg'?'24':'28'}px;">${fmtPressure(c.pressure_msl)}</div>
       <div class="m-unit">${pressureUnit()}</div>
     </div>
 
     <div class="m-card" data-detail="moon" style="min-height:200px;">
+      <div class="m-bg">
+        <div class="m-star lg" style="top:14%; left:18%; animation-delay:0s;"></div>
+        <div class="m-star" style="top:22%; left:62%; animation-delay:0.6s;"></div>
+        <div class="m-star" style="top:36%; left:88%; animation-delay:1.2s;"></div>
+        <div class="m-star lg" style="top:58%; left:12%; animation-delay:0.4s;"></div>
+        <div class="m-star" style="top:72%; left:78%; animation-delay:1.8s;"></div>
+        <div class="m-star" style="top:84%; left:42%; animation-delay:0.9s;"></div>
+        <div class="m-star" style="top:18%; left:80%; animation-delay:2.1s;"></div>
+        <div class="m-star" style="top:50%; left:50%; animation-delay:1.5s;"></div>
+      </div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Moon phase</div>
       ${buildMoonSVG(moon.phase)}
       <div class="m-desc" style="margin-top:4px;"><strong style="color:#fff;">${moon.name}</strong> · ${moon.illumination}% lit</div>
     </div>
 
     <div class="m-card" data-detail="aqi" id="aqiCard" style="min-height:160px;">
+      <div class="m-bg">
+        <div class="aq-particle" style="left:18%; top:80%; animation-delay:0s;"></div>
+        <div class="aq-particle" style="left:42%; top:80%; animation-delay:1.8s; width:3px; height:3px;"></div>
+        <div class="aq-particle" style="left:66%; top:80%; animation-delay:0.9s;"></div>
+        <div class="aq-particle" style="left:82%; top:80%; animation-delay:3s; width:5px; height:5px;"></div>
+        <div class="aq-particle" style="left:30%; top:80%; animation-delay:4.2s;"></div>
+      </div>
       <div class="m-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg> Air Quality</div>
       <div class="m-val" id="aqiVal" style="color:var(--text-tertiary);">--</div>
       <div class="m-desc" id="aqiLabel">Loading...</div>
