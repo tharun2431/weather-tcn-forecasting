@@ -1658,6 +1658,149 @@ body.is-night .meteors { opacity: 1; }
   background: none; border: none; cursor: pointer; padding: 4px;
   color: var(--text-tertiary); font-size: 18px; line-height: 1;
 }
+
+/* ===== TIME-OF-DAY DYNAMIC BACKGROUND ===== */
+body.is-dawn {
+  --bg-gradient-1: #ff9966; --bg-gradient-2: #2d3a5e;
+}
+body.is-day {
+  --bg-gradient-1: #5e83b5; --bg-gradient-2: #1d2c43;
+}
+body.is-dusk {
+  --bg-gradient-1: #b56b78; --bg-gradient-2: #1f1538;
+}
+body.is-night {
+  --bg-gradient-1: #2a3354; --bg-gradient-2: #0a0f1c;
+}
+body { transition: background 1.2s ease; }
+
+/* ===== MODE TOGGLE (Standard | Neural) ===== */
+.mode-toggle {
+  display: inline-flex; align-items: center;
+  background: rgba(14,16,20,0.6);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px;
+  padding: 4px;
+  margin: 8px 0 14px;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.mode-opt {
+  position: relative; z-index: 2;
+  padding: 7px 18px;
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  cursor: pointer; border-radius: 999px;
+  transition: color 0.25s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.mode-opt svg { width: 13px; height: 13px; }
+.mode-opt.active { color: #0f1319; }
+.mode-thumb {
+  position: absolute;
+  top: 4px; bottom: 4px;
+  width: calc(50% - 4px);
+  background: linear-gradient(135deg, #8ab4f8, #c084fc);
+  border-radius: 999px;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+  z-index: 1;
+  box-shadow: 0 4px 14px rgba(138,180,248,0.4);
+}
+body[data-mode="neural"] .mode-thumb {
+  transform: translateX(100%);
+  background: linear-gradient(135deg, #c084fc, #8ab4f8);
+  box-shadow: 0 4px 14px rgba(192,132,252,0.5);
+}
+/* Mode-conditional show/hide */
+body[data-mode="standard"] .neural-only { display: none !important; }
+body[data-mode="neural"] .standard-only { display: none !important; }
+.neural-only { display: block; }
+
+/* Neural-mode stat strip */
+.neural-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin: 10px 0 14px;
+}
+.neural-stat {
+  background: rgba(192,132,252,0.06);
+  border: 1px solid rgba(192,132,252,0.18);
+  border-radius: 14px;
+  padding: 10px 8px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.neural-stat::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(192,132,252,0.08) 60%, transparent 80%);
+  animation: neuralShine 3.5s linear infinite;
+}
+@keyframes neuralShine {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.neural-stat .v {
+  font-size: 16px; font-weight: 700; color: #c084fc;
+  font-family: 'JetBrains Mono', 'Inter', monospace;
+  letter-spacing: -0.3px;
+  position: relative; z-index: 1;
+}
+.neural-stat .l {
+  font-size: 9px; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-top: 3px; font-weight: 600;
+  position: relative; z-index: 1;
+}
+.neural-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(192,132,252,0.12), rgba(138,180,248,0.08));
+  border: 1px solid rgba(192,132,252,0.22);
+  border-radius: 16px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+}
+.neural-banner .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #c084fc;
+  box-shadow: 0 0 10px #c084fc;
+  animation: pulseDot 2s ease-out infinite;
+  flex-shrink: 0;
+}
+
+/* ===== 3D CARD TILT ===== */
+.m-card { will-change: transform; transform-style: preserve-3d; }
+.m-card.tilting {
+  transition: transform 0.08s linear, box-shadow 0.3s;
+}
+
+/* ===== CONFETTI CANVAS ===== */
+.confetti-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9999;
+  display: none;
+}
+.confetti-canvas.firing { display: block; }
+
+/* ===== VERSION BADGE ===== */
+.version-badge {
+  position: fixed;
+  bottom: calc(8px + var(--safe-bottom));
+  right: 12px;
+  font-size: 9px; font-weight: 600;
+  color: rgba(255,255,255,0.25);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 50;
+  font-family: 'JetBrains Mono', 'Inter', monospace;
+}
+.version-badge .dot { color: rgba(192,132,252,0.5); margin: 0 4px; }
+.version-badge:hover { color: rgba(255,255,255,0.5); }
 </style>
 </head>
 <body>
@@ -1734,10 +1877,37 @@ body.is-night .meteors { opacity: 1; }
       <div class="location" onclick="showScreen('searchScreen')"><span id="cityName">Jena</span></div>
     </div>
 
+    <!-- Mode toggle: Standard | Neural -->
+    <div class="mode-toggle" id="modeToggle">
+      <div class="mode-thumb"></div>
+      <div class="mode-opt active" data-mode="standard" onclick="setMode('standard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v1M12 20v1M3 12h1M20 12h1M5.6 5.6l.7.7M18.4 18.4l-.7-.7M5.6 18.4l.7-.7M18.4 5.6l-.7.7"/><circle cx="12" cy="12" r="4"/></svg>
+        Standard
+      </div>
+      <div class="mode-opt" data-mode="neural" onclick="setMode('neural')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h8M14 12l4-4M10 12l-4-4M14 12l4 4M10 12l-4 4"/></svg>
+        Neural
+      </div>
+    </div>
+
     <!-- Favorites bar -->
     <div class="fav-bar" id="favBar"></div>
 
-    <div class="live-badge" id="aiStatusBadge">
+    <!-- Neural-mode banner: model status + dataset info -->
+    <div class="neural-banner neural-only">
+      <div class="pulse"></div>
+      <span><strong style="color:#c084fc;">ONNX</strong> · Stacking Ensemble · <strong style="color:#fff;">420,551</strong> training rows · Jena Climate 2009–2016</span>
+    </div>
+
+    <!-- Neural-mode quick stats strip -->
+    <div class="neural-strip neural-only">
+      <div class="neural-stat"><div class="v">0.37°</div><div class="l">MAE</div></div>
+      <div class="neural-stat"><div class="v">0.99</div><div class="l">R²</div></div>
+      <div class="neural-stat"><div class="v">214K</div><div class="l">Params</div></div>
+      <div class="neural-stat"><div class="v">&lt;15ms</div><div class="l">Inference</div></div>
+    </div>
+
+    <div class="live-badge neural-only" id="aiStatusBadge">
       <div class="dot"></div>
       <span id="aiBadgeText">LOADING MODEL</span>
     </div>
@@ -1754,7 +1924,7 @@ body.is-night .meteors { opacity: 1; }
     </div>
 
     <!-- AI Weather Report -->
-    <div class="predict-card">
+    <div class="predict-card neural-only">
       <div class="ai-header">
         <div class="ai-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 3-6 3-3 6-3-6-6-3 6-3z"/></svg>
@@ -3211,6 +3381,9 @@ function renderAccuracyComparison(hourlyData, currentHourIndex, futurePrediction
     <div class="acc-metric"><div class="val">${rmse.toFixed(2)}°</div><div class="lbl">RMSE</div></div>
     <div class="acc-metric"><div class="val">${accuracy.toFixed(1)}%</div><div class="lbl">Accuracy</div></div>
   `;
+
+  // Demo magic: confetti burst when AI accuracy ≥ 95%
+  maybeFireConfettiForAccuracy(accuracy);
 }
 
 // ===== RENDER =====
@@ -3225,8 +3398,12 @@ function renderWeather(data, city) {
   // Main weather
   const weatherInfo = getWeatherInfo(c.weather_code);
   const night = d.sunrise && d.sunset ? isNightTime(d.sunrise[0], d.sunset[0]) : false;
-  document.body.classList.toggle('is-night', night);
-  document.body.classList.toggle('is-day', !night);
+  // Apply time-of-day gradient (dawn / day / dusk / night)
+  if (d.sunrise && d.sunset) applyTimeOfDay(d.sunrise[0], d.sunset[0]);
+  else {
+    document.body.classList.toggle('is-night', night);
+    document.body.classList.toggle('is-day', !night);
+  }
   updateWeatherTheme(c.weather_code, night);
   updateThemeOverride();
   currentWeatherKind = weatherInfo.kind;
@@ -3573,6 +3750,9 @@ function renderWeather(data, city) {
     });
   });
 
+  // 3D tilt on metric cards (desktop hover only)
+  attach3DTilt();
+
   // Show weather
   document.getElementById('loadingScreen').style.display = 'none';
   showScreen('weatherScreen');
@@ -3681,7 +3861,137 @@ setTimeout(() => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
+
+// ===== APP VERSION =====
+const APP_VERSION = '1.5.0';
+const APP_BUILD = '2026.04.26';
+(function setVersionPill() {
+  const el = document.getElementById('versionBadge');
+  if (el) el.innerHTML = `v${APP_VERSION}<span class="dot">·</span>build ${APP_BUILD}`;
+})();
+
+// ===== STANDARD | NEURAL MODE TOGGLE =====
+function setMode(mode) {
+  document.body.setAttribute('data-mode', mode);
+  localStorage.setItem('dw_mode', mode);
+  document.querySelectorAll('.mode-opt').forEach(el => {
+    el.classList.toggle('active', el.dataset.mode === mode);
+  });
+  haptic && haptic();
+}
+(function initMode() {
+  const saved = localStorage.getItem('dw_mode') || 'standard';
+  setMode(saved);
+})();
+
+// ===== TIME-OF-DAY DYNAMIC GRADIENT =====
+// Detects dawn / day / dusk / night based on sunrise/sunset and applies CSS class.
+function applyTimeOfDay(sunriseISO, sunsetISO) {
+  const now = new Date();
+  const sr = sunriseISO ? new Date(sunriseISO) : null;
+  const ss = sunsetISO ? new Date(sunsetISO) : null;
+  if (!sr || !ss) return;
+  // Window: 75 min around sunrise = dawn, 75 min around sunset = dusk
+  const dawnStart = new Date(sr.getTime() - 60 * 60 * 1000);
+  const dawnEnd   = new Date(sr.getTime() + 30 * 60 * 1000);
+  const duskStart = new Date(ss.getTime() - 30 * 60 * 1000);
+  const duskEnd   = new Date(ss.getTime() + 60 * 60 * 1000);
+  let cls = 'is-night';
+  if (now >= dawnStart && now < dawnEnd)      cls = 'is-dawn';
+  else if (now >= dawnEnd && now < duskStart) cls = 'is-day';
+  else if (now >= duskStart && now < duskEnd) cls = 'is-dusk';
+  else                                         cls = 'is-night';
+  document.body.classList.remove('is-dawn', 'is-day', 'is-dusk', 'is-night');
+  document.body.classList.add(cls);
+}
+
+// ===== 3D CARD TILT (desktop only) =====
+function attach3DTilt() {
+  if (matchMedia('(hover: none)').matches) return; // skip on touch
+  const cards = document.querySelectorAll('.m-card');
+  cards.forEach(card => {
+    if (card._tiltAttached) return;
+    card._tiltAttached = true;
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = (e.clientX - cx) / (r.width / 2);
+      const dy = (e.clientY - cy) / (r.height / 2);
+      const rx = -dy * 6;
+      const ry = dx * 6;
+      card.classList.add('tilting');
+      card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.classList.remove('tilting');
+      card.style.transform = '';
+    });
+  });
+}
+
+// ===== CONFETTI BURST (vanilla, no library) =====
+function fireConfetti(durationMs = 2200) {
+  const cv = document.getElementById('confettiCanvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  cv.width = innerWidth;
+  cv.height = innerHeight;
+  cv.classList.add('firing');
+  const colors = ['#8ab4f8', '#c084fc', '#ffd166', '#81c995', '#f28b82', '#ffffff'];
+  const N = 140;
+  const particles = [];
+  for (let i = 0; i < N; i++) {
+    particles.push({
+      x: innerWidth / 2 + (Math.random() - 0.5) * 80,
+      y: innerHeight / 2,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -8 - Math.random() * 9,
+      g: 0.28 + Math.random() * 0.12,
+      size: 4 + Math.random() * 6,
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      shape: Math.random() < 0.5 ? 'rect' : 'circle',
+      life: 1
+    });
+  }
+  const start = performance.now();
+  function frame(t) {
+    const elapsed = t - start;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    particles.forEach(p => {
+      p.vy += p.g;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life = Math.max(0, 1 - elapsed / durationMs);
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      if (p.shape === 'rect') ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.45);
+      else { ctx.beginPath(); ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    });
+    if (elapsed < durationMs) requestAnimationFrame(frame);
+    else { ctx.clearRect(0, 0, cv.width, cv.height); cv.classList.remove('firing'); }
+  }
+  requestAnimationFrame(frame);
+}
+let _lastConfettiAccuracy = 0;
+function maybeFireConfettiForAccuracy(acc) {
+  if (acc >= 95 && _lastConfettiAccuracy < 95) fireConfetti();
+  _lastConfettiAccuracy = acc;
+}
 </script>
+
+<!-- Confetti canvas (top-layer, only fires on AI accuracy ≥ 95%) -->
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+<!-- Version pill -->
+<div class="version-badge" id="versionBadge"></div>
 
 </body>
 </html>
