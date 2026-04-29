@@ -34,7 +34,7 @@ Upload `notebooks/Tharun_ML3.ipynb` to Colab (after M2 finishes).
 ### 4. Launch Dashboard
 
 **🌍 Live Cloud Deployment:**  
-👉 **[weather-tcn-forecasting.streamlit.app](https://weather-tcn-forecasting.streamlit.app)**
+👉 **[https://huggingface.co/spaces/Tharunp2431/weather-forecasting)**
 
 *To run legally/locally:*
 ```bash
