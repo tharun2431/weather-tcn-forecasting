@@ -1,4 +1,4 @@
-const CACHE_NAME = 'deepweather-v37-compare-ticker';
+const CACHE_NAME = 'deepweather-v38-about';
 const urlsToCache = ['/'];
 
 self.addEventListener('install', event => {
