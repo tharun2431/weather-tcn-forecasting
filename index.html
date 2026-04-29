@@ -2089,7 +2089,7 @@ body[data-mode="neural"] .standard-only { display: none !important; }
     <!-- Neural-mode banner: model status + dataset info -->
     <div class="neural-banner neural-only">
       <div class="pulse"></div>
-      <span><strong style="color:#c084fc;">ONNX</strong> · Stacking Ensemble · <strong style="color:#fff;">420,551</strong> training rows · Jena Climate 2009–2016</span>
+      <span><strong style="color:#c084fc;">ONNX</strong> · LSTM · <strong style="color:#fff;">420,551</strong> training rows · Jena Climate 2009–2016</span>
     </div>
 
     <!-- Neural-mode quick stats strip -->
@@ -2465,9 +2465,9 @@ body[data-mode="neural"] .standard-only { display: none !important; }
     <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
     <span>Settings</span>
   </div>
-  <div class="nav-item" onclick="showScreen('compareScreen')" id="navCompare">
-    <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></div>
-    <span>Compare</span>
+  <div class="nav-item" onclick="showScreen('aboutScreen')" id="navAbout">
+    <div class="nav-icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+    <span>About</span>
   </div>
 </div>
 
@@ -4014,7 +4014,7 @@ function showScreen(screenId) {
   document.getElementById(screenId).classList.add('active');
 
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const navMap = { weatherScreen: 'navWeather', modelsScreen: 'navModels', searchScreen: 'navSearch', settingsScreen: 'navSettings', aboutScreen: 'navAbout', compareScreen: 'navCompare' };
+  const navMap = { weatherScreen: 'navWeather', modelsScreen: 'navModels', searchScreen: 'navSearch', settingsScreen: 'navSettings', aboutScreen: 'navAbout' };
   if (navMap[screenId]) document.getElementById(navMap[screenId])?.classList.add('active');
   if (screenId === 'settingsScreen') renderSettings();
   if (screenId === 'compareScreen') initCompareScreen();
