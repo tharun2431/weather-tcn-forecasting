@@ -2709,9 +2709,8 @@ function generateSmartNarrative(c, d, predictions) {
 }
 
 // ===== HOURLY CHART (1:1 aligned with items: 56px per hour, smooth curve) =====
-function renderHourlyChart(temps, times) {
-  const host = document.getElementById('hourlyChartHost');
-  if (!host || !temps.length) return;
+function renderHourlyChartSvg(temps) {
+  if (!temps.length) return '';
   const ITEM_W = 56;
   const n = temps.length;
   const totalW = ITEM_W * n;
@@ -2752,9 +2751,8 @@ function renderHourlyChart(temps, times) {
     return `<circle cx="${x}" cy="${y}" r="3.5" fill="#fff" stroke="#8ab4f8" stroke-width="1.5"/>`;
   }).join('');
 
-  host.style.width = totalW + 'px';
-  host.innerHTML = `
-    <svg viewBox="0 0 ${totalW} ${H}" width="${totalW}" height="${H}" preserveAspectRatio="none" style="width:${totalW}px;">
+  return `
+    <svg viewBox="0 0 ${totalW} ${H}" width="${totalW}" height="${H}" preserveAspectRatio="none" style="width:${totalW}px; display:block;">
       <defs>
         <linearGradient id="chartLineGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffd166"/>
@@ -2770,6 +2768,13 @@ function renderHourlyChart(temps, times) {
       <path class="chart-line" d="${path}" fill="none" stroke="url(#chartLineGrad)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
       ${markers}
     </svg>`;
+}
+
+function renderHourlyChart(temps, times) {
+  const host = document.getElementById('hourlyChartHost');
+  if (!host || !temps.length) return;
+  host.style.width = (56 * temps.length) + 'px';
+  host.innerHTML = renderHourlyChartSvg(temps);
 }
 
 // ===== DETAIL MODAL =====
@@ -3702,7 +3707,8 @@ function renderWeather(data, city) {
       document.getElementById('predText').innerHTML = generateSmartNarrative(c, d, predictions);
 
       let hourlyHtml = '';
-      const temps = [];
+      const standardTemps = [];
+      const neuralTemps = [];
       const timeLabels = [];
       for (let i = 0; i < 24; i++) {
         const hourIndex = currentHourIndex + i;
@@ -3710,20 +3716,34 @@ function renderWeather(data, city) {
         const time = new Date(h.time[hourIndex]);
         const timeStr = i === 0 ? 'Now' : time.toLocaleTimeString([], { hour: '2-digit', hour12: true }).replace(/^0/, '');
         const info = getWeatherInfo(h.weather_code[hourIndex]);
-        const displayTemp = i === 0 ? c.temperature_2m : predictions[i-1];
-        temps.push(displayTemp);
+        
+        const standardTemp = h.temperature_2m[hourIndex];
+        const neuralTemp = i === 0 ? c.temperature_2m : predictions[i-1];
+        
+        standardTemps.push(standardTemp);
+        neuralTemps.push(neuralTemp);
         timeLabels.push(h.time[hourIndex]);
+        
         const precip = h.precipitation_probability ? h.precipitation_probability[hourIndex] : 0;
         hourlyHtml += `
           <div class="hourly-item">
-            <div class="h-temp">${fmtTemp(displayTemp)}°</div>
+            <div class="h-temp standard-only">${fmtTemp(standardTemp)}°</div>
+            <div class="h-temp neural-only">${fmtTemp(neuralTemp)}°</div>
             <div class="h-icon">${info.icon}</div>
             <div class="h-precip">${precip}%</div>
             <div class="h-time">${timeStr}</div>
           </div>`;
       }
       document.getElementById('hourlyScroll').innerHTML = hourlyHtml;
-      renderHourlyChart(temps, timeLabels);
+      
+      const host = document.getElementById('hourlyChartHost');
+      if (host) {
+        host.style.width = (56 * 24) + 'px';
+        host.innerHTML = `
+          <div class="standard-only">${renderHourlyChartSvg(standardTemps)}</div>
+          <div class="neural-only">${renderHourlyChartSvg(neuralTemps)}</div>
+        `;
+      }
 
       // === PREDICTION VS ACTUAL COMPARISON ===
       renderAccuracyComparison(h, currentHourIndex, predictions);
