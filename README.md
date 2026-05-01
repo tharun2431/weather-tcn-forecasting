@@ -62,7 +62,7 @@ streamlit run app.py
 ## Dataset
 
 **Jena Climate Dataset** — Max Planck Institute for Biogeochemistry  
-14 meteorological features, hourly resolution, 2009–2022
+14 meteorological features, hourly resolution, 2009–2016
 
 ## Results
 
