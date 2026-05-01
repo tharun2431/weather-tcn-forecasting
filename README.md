@@ -47,7 +47,6 @@ streamlit run app.py
 ├── app.py                     # Streamlit web dashboard
 ├── requirements.txt           # Python dependencies
 ├── notebooks/
-│   ├── Tharun_ML1.ipynb       # Data exploration
 │   ├── Tharun_ML2.ipynb       # Model training
 │   └── Tharun_ML3.ipynb       # Evaluation & analysis
 ├── docs/
