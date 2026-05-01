@@ -2992,6 +2992,14 @@ function fmtTemp(c) {
   const u = getSetting('temp');
   return Math.round(u === 'F' ? (c * 9/5) + 32 : c);
 }
+// Same as fmtTemp but keeps one decimal place. Used in neural mode so the
+// LSTM's ~0.4 degC corrections are actually visible (integer rounding hides them).
+function fmtTemp1(c) {
+  if (c == null || isNaN(c)) return '--';
+  const u = getSetting('temp');
+  const v = u === 'F' ? (c * 9/5) + 32 : c;
+  return v.toFixed(1);
+}
 function tempUnit() { return getSetting('temp') === 'F' ? '°F' : '°C'; }
 function fmtWind(kmh) {
   if (kmh == null || isNaN(kmh)) return '--';
@@ -3728,7 +3736,7 @@ function renderWeather(data, city) {
         hourlyHtml += `
           <div class="hourly-item">
             <div class="h-temp standard-only">${fmtTemp(standardTemp)}°</div>
-            <div class="h-temp neural-only">${fmtTemp(neuralTemp)}°</div>
+            <div class="h-temp neural-only" title="LSTM prediction (1-decimal precision)">${fmtTemp1(neuralTemp)}°</div>
             <div class="h-icon">${info.icon}</div>
             <div class="h-precip">${precip}%</div>
             <div class="h-time">${timeStr}</div>
