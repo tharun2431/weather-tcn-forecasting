@@ -31,3 +31,7 @@ Thumbs.db
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Node
+node_modules/
+package-lock.json
