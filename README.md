@@ -18,6 +18,12 @@ This project investigates hybrid deep learning architectures for short-term temp
 | TCN-LSTM | Hybrid (Innovation) | 174,273 |
 | Ensemble | Stacking Meta-learner | — |
 
+
+## GOOGLE COLAB NOTEBOOK LINKS :
+
+Milestone 2 : https://colab.research.google.com/drive/1GaMMA-EdnbM0dfWsoPrTPCQuk0wNfyay?usp=sharing
+Milestone 3 : https://colab.research.google.com/drive/1Y5y4pDpZekDqi3yThXc15Rh347ZIDc5k?usp=sharing
+
 ## Quick Start
 
 ### 1. Install Dependencies
