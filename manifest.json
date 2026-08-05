@@ -1,65 +1,15 @@
 {
-  "id": "/weather-tcn-forecasting/",
-  "name": "DeepWeather - Neural Network Forecast",
+  "name": "DeepWeather — multi-city neural forecasting",
   "short_name": "DeepWeather",
-  "description": "Weather forecasting powered by hybrid deep learning models (LSTM, TCN, Ensemble)",
-  "start_url": "/weather-tcn-forecasting/",
-  "scope": "/weather-tcn-forecasting/",
+  "description": "Multi-city weather forecasting with a neural network running in your browser, with calibrated uncertainty intervals.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "display_override": ["fullscreen", "standalone"],
-  "background_color": "#0f0f1a",
-  "theme_color": "#0f0f1a",
   "orientation": "portrait",
-  "lang": "en",
-  "dir": "ltr",
-  "categories": ["weather", "education", "utilities"],
-  "iarc_rating_id": "",
-  "prefer_related_applications": false,
+  "background_color": "#0d1014",
+  "theme_color": "#0d1014",
   "icons": [
-    {
-      "src": "/weather-tcn-forecasting/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/weather-tcn-forecasting/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/weather-tcn-forecasting/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/weather-tcn-forecasting/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/weather-tcn-forecasting/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "DeepWeather home screen"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Search City",
-      "url": "/weather-tcn-forecasting/#search",
-      "icons": [
-        {
-          "src": "/weather-tcn-forecasting/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
